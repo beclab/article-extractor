@@ -1,4 +1,4 @@
-module github.com/Above-Os/article-extractor
+module github.com/beclab/article-extractor
 
 go 1.20
 

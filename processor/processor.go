@@ -8,12 +8,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Above-Os/article-extractor/readability"
-	"github.com/Above-Os/article-extractor/rewrite"
-	"github.com/Above-Os/article-extractor/sanitizer"
-	"github.com/Above-Os/article-extractor/templates"
-	"github.com/Above-Os/article-extractor/templates/postExtractor"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/beclab/article-extractor/readability"
+	"github.com/beclab/article-extractor/rewrite"
+	"github.com/beclab/article-extractor/sanitizer"
+	"github.com/beclab/article-extractor/templates"
+	"github.com/beclab/article-extractor/templates/postExtractor"
 )
 
 func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, isrecommend bool) (string, string, *time.Time, string, string, string, string, int64) {
