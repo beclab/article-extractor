@@ -17,7 +17,7 @@ For some websites, specific configuration templates are used to improve the accu
 To install this package, just run `go get` :
 
 ```
-go get github.com/Above-Os/article-extractor
+go get github.com/beclab/article-extractor
 ```
 
 ## Usage
