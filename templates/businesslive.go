@@ -2,6 +2,7 @@ package templates
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -15,7 +16,7 @@ type BusinessliveMetadata struct {
 	MainEntityOfPage string    `json:"mainEntityOfPage"`
 	Headline         string    `json:"headline"`
 	Description      string    `json:"description"`
-	DatePublished    time.Time `json:"datePublished"`
+	DatePublished    string `json:"datePublished"`
 	DateModified     string    `json:"dateModified"`
 	Author           struct {
 		Type string `json:"@type"`
@@ -63,7 +64,7 @@ func (t *Template) BusinessliveScrapMetaData(document *goquery.Document) (string
 			var firstTypeMetaData BusinessliveMetadata
 			unmarshalErr := json.Unmarshal([]byte(scriptContent), &firstTypeMetaData)
 			if unmarshalErr != nil {
-				log.Printf("convert SkyNewsScrap unmarshalError %v", unmarshalErr)
+				log.Printf("convert businesslive unmarshalError %v", unmarshalErr)
 				return
 			}
 			author = firstTypeMetaData.Author.Name
@@ -103,8 +104,14 @@ func (t *Template) BusinesslivePublishedAtTimeFromScriptMetadata(document *goque
 				return
 
 			}
-			publishedAt = firstTypeMetaData.DatePublished.Unix()
-			//publishedAt = firstTypeMetaData[0].DatePublished.Unix()
+			fmt.Println(firstTypeMetaData.DatePublished)
+			parsedTimeStamp,parseTimeStampErr := parseBusinessliveStrTimeToTimestamp(firstTypeMetaData.DatePublished)
+			if parseTimeStampErr != nil {
+				log.Printf("parse businesslive str time to timestamp err")
+				return
+			}
+			publishedAt = parsedTimeStamp
+			// publishedAt = firstTypeMetaData.DatePublished
 		})
 
 	}
@@ -125,4 +132,13 @@ func (t *Template) BusinessLiveScrapContent(document *goquery.Document) string {
 	})
 	return contents
 
+}
+
+func parseBusinessliveStrTimeToTimestamp(timeStr string) (int64, error) {
+	const layout = "2006-01-02T15:04:05-0700"
+	t, err := time.Parse(layout, timeStr)
+	if err != nil {
+		return 0, err // 返回错误和0时间戳
+	}
+	return t.Unix(), nil
 }

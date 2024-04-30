@@ -160,10 +160,7 @@ var metadataTemplatePredefinedRules = map[string]string{
 	"themoscowtimes.com": "ThemoscowtimesScrapMetaData",
 	"themessenger.com":   "ThemessengerScrapMetaData",
 	"theguardian.com":    "TheguardianScrapMetaData",
-	// "bbc.com":             "BBCScrapMetaData",
-	// ".bbc.co.":            "BBCScrapMetaData",
 	"www.bbc.co.uk/news":  "BBCNewsScrapMetaData",
-	"time.com":            "TimesScrapMetaData",
 	"npr.org":             "NprScrapMetaData",
 	"stereogum.com":       "StereogumScrapMetaData",
 	"www.vice.com":        "ViceScrapMetaData",
@@ -181,6 +178,10 @@ var metadataTemplatePredefinedRules = map[string]string{
 	".espn.com":           "ESPNScrapMetaData",
 	"foxsports.com":       "FoxsportsScrapMetaData",
 	"hbr.org":             "HBRScrapMetaData",
+	"nbcsports.com":       "NBCSPortScrapMetaData",
+	"cncf.io":             "CNCFScrapMetaData",
+	"time.com":            "TimeScrapMetaData",
+	"deepmind.google":     "DeepMindScrapMetaData",
 }
 
 var publishedAtTimeStampTemplatePredefinedRules = map[string]string{
@@ -203,10 +204,8 @@ var publishedAtTimeStampTemplatePredefinedRules = map[string]string{
 	"themoscowtimes.com": "CommonGetPublishedAtTimestampSingleJson",
 	"themessenger.com":   "TheMessengerGetPublishedAtTimestampSingleJson",
 	"theguardian.com":    "CommonGetPublishedAtTimestampMultipleJson",
-	// "bbc.com":             "CommonGetPublishedAtTimestampSingleJson",
-	// ".bbc.co.":            "CommonGetPublishedAtTimestampSingleJson",
 	"www.bbc.co.uk/news":  "BBCNewsPublishedAtTimeFromScriptMetadata",
-	"time.com":            "CommonGetPublishedAtTimestampMultipleJson",
+	"time.com":            "TimePublishedAtTimeFromScriptMetadata",
 	"eonline.com":         "EonlinePublishedAtTimeFromScriptMetadata",
 	"npr.org":             "NprPublishedAtTimeFromScriptMetadata",
 	"stereogum.com":       "StereogumPublishedAtTimeFromScriptMetadata",
@@ -224,6 +223,9 @@ var publishedAtTimeStampTemplatePredefinedRules = map[string]string{
 	"espn.com":            "ESPNPublishedAtTimeFromScriptMetadata",
 	"foxsports.com":       "FoxsportsPublishedAtTimeFromScriptMetadata",
 	"hbr.org":             "HBRPublishedAtTimeFromScriptMetadata",
+	"nbcsports.com":       "NBCSportsPublishedAtTimeFromScriptMetadata",
+	"cncf.io":             "CNCFPublishedAtTimeFromScriptMetadata",
+	"deepmind.google":     "DeepMindPublishedAtTimeFromScriptMetadata",
 }
 
 func getPredefinedPublishedAtTimestampTemplateRules(websiteURL string) (string, string) {
