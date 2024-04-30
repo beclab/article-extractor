@@ -3,6 +3,7 @@ package templates
 import (
 	"encoding/json"
 	"log"
+	"regexp"
 	"strings"
 	"time"
 
@@ -17,14 +18,6 @@ type CNCFMetaData struct {
 		URL             string `json:"url"`
 		Name            string `json:"name"`
 		InLanguage      string `json:"inLanguage"`
-		PotentialAction struct {
-			Type   string `json:"@type"`
-			Target struct {
-				Type        string `json:"@type"`
-				URLTemplate string `json:"urlTemplate"`
-			} `json:"target"`
-			QueryInput string `json:"query-input"`
-		} `json:"potentialAction,omitempty"`
 		Publisher struct {
 			Type   string   `json:"@type"`
 			ID     string   `json:"@id"`
@@ -54,8 +47,8 @@ type CNCFMetaData struct {
 				Name     string `json:"name"`
 			} `json:"itemListElement"`
 		} `json:"breadcrumb,omitempty"`
-		DatePublished time.Time `json:"datePublished,omitempty"`
-		DateModified  time.Time `json:"dateModified,omitempty"`
+		DatePublished string `json:"datePublished,omitempty"`
+		DateModified  string `json:"dateModified,omitempty"`
 		Author        struct {
 			Type string `json:"@type"`
 			ID   string `json:"@id"`
@@ -83,10 +76,11 @@ func (t *Template) CNCFScrapMetaData(document *goquery.Document) (string, string
 
 	author := ""
 	published_at := ""
+	/*
 	scriptSelectorFirst := "head > script[type=\"application/ld+json\"]"
 	scriptSelectorSecond := "body > script[type=\"application/ld+json\"]"
 	scriptSelectorThird := "script[type=\"application/ld+json\"]"
-
+    
 	scriptSelectorList := make([]string, 100)
 	scriptSelectorList = append(scriptSelectorList, scriptSelectorFirst)
 	scriptSelectorList = append(scriptSelectorList, scriptSelectorSecond)
@@ -116,9 +110,64 @@ func (t *Template) CNCFScrapMetaData(document *goquery.Document) (string, string
 		if author != "" {
 			break
 		}
+	}*/
+
+	document.Find("span.post-author__author").Each(func(i int, s *goquery.Selection) {
+        spanContent := s.Text()
+		author = strings.TrimPrefix(spanContent, "By ")
+
+    })
+
+	if len(author) == 0 {
+		document.Find("div.post-author").Next().Each(func(i int, s *goquery.Selection) {
+			emContent := s.Find("em").Text()
+			cleanContent := strings.Replace(emContent, "\u00a0", "", -1) 
+			cleanContent = strings.TrimPrefix(cleanContent, "Community post by ")
+			cleanContent = strings.TrimPrefix(cleanContent, "Member post by ")
+			cleanContent = strings.TrimPrefix(cleanContent,"Community post originally published on Medium by ")
+			cleanContent = strings.TrimPrefix(cleanContent,"Project post by ")
+			cleanContent = strings.TrimPrefix(cleanContent,"Member post originally published on Greptime’s blog by ")
+			extractAuthor,extractSuccess:=extractAuthorFromCNCFName(cleanContent)
+			if extractSuccess {
+				author = extractAuthor
+			}else{
+				author = cleanContent
+			}
+		})
+
 	}
-	log.Printf("author last: %s", author)
+
 	return author, published_at
+}
+
+func parseCNCFDateTimeToTimestamp(dateTimeStr string) (int64, error) {
+	dateTimeStr =  addSecondsIfMissing(dateTimeStr)
+	log.Printf("-------------- %s",dateTimeStr)
+	layout := "2006-01-02T15:04:05-07:00" 
+	t, err := time.Parse(layout, dateTimeStr)
+	if err != nil {
+		log.Printf("parse cncf time err %v",err)
+		return 0,err
+	}
+	return t.Unix(), nil
+}
+
+
+func addSecondsIfMissing(dateTimeStr string) string {
+    re := regexp.MustCompile(`^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})\+(\d{2}:\d{2})$`)
+
+    if re.MatchString(dateTimeStr) {
+        dateTimeStr = re.ReplaceAllString(dateTimeStr, "${1}:00+${2}")
+    }
+    return dateTimeStr
+}
+func extractAuthorFromCNCFName(input string) (string, bool) {
+	re := regexp.MustCompile(`Member post originally published on ([^’]+)’s blog`)
+	matches := re.FindStringSubmatch(input)
+	if len(matches) >= 2 {
+		return matches[1], true
+	}
+	return "", false
 }
 
 func (t *Template) CNCFPublishedAtTimeFromScriptMetadata(document *goquery.Document) int64 {
@@ -144,16 +193,21 @@ func (t *Template) CNCFPublishedAtTimeFromScriptMetadata(document *goquery.Docum
 			var firstTypeMetaData CNCFMetaData
 			unmarshalErr := json.Unmarshal([]byte(scriptContent), &firstTypeMetaData)
 			if unmarshalErr != nil {
-				log.Printf("convert SkyNewsScrap unmarshalError %v", unmarshalErr)
+				log.Printf("convert cncf unmarshalError %v", unmarshalErr)
 				return
 
 			}
 
 			for _, currentGraph := range firstTypeMetaData.Graph {
-				if currentGraph.DatePublished.Unix() > 0 {
-					publishedAt = currentGraph.DatePublished.Unix()
-					break
+				if publishedAt != 0 {
+					return
 				}
+				parseTime,parseTimeErr:=parseCNCFDateTimeToTimestamp(currentGraph.DatePublished)
+				if parseTimeErr != nil {
+					log.Printf("parset CNCF time to timetamp error %v",parseTimeErr)
+					continue
+				}
+				publishedAt =parseTime
 			}
 			//publishedAt = firstTypeMetaData[0].DatePublished.Unix()
 		})
