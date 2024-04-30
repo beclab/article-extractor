@@ -25,7 +25,7 @@ func GetArticleByDivClass(document *goquery.Document) string {
 	/*cnn  article__content
 	  fortune.com articleContent
 	*/
-	document.Find("div.entry-content,div.content-entry,div.entry-body,div.article-detail,div.entry,div.entry__content,div.article__content,div.articleContent").Each(func(i int, s *goquery.Selection) {
+	document.Find("div.entry-content,div.content-entry,div.article-detail,div.entry,div.entry__content,div.article__content,div.articleContent").Each(func(i int, s *goquery.Selection) {
 		text := s.Text()
 		len := usefulContentLen(text)
 		if len > 300 {
