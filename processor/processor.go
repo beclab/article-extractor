@@ -108,7 +108,7 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 		}*/
 	}
 
-	_,  := getPredefinedPublishedAtTimestampTemplateRules(entryUrl)
+	_, publishedAtRule := getPredefinedPublishedAtTimestampTemplateRules(entryUrl)
 	log.Printf("current publishedAtRule %s", publishedAtRule)
 	if publishedAtRule != "" {
 		f := funcs.MethodByName(publishedAtRule)
