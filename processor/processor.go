@@ -16,6 +16,65 @@ import (
 	"github.com/beclab/article-extractor/templates/postExtractor"
 )
 
+func ArticleContentExtractor(rawContent, entryUrl, feedUrl, rules string) (string, string) {
+	templateRawData := strings.NewReader(rawContent)
+	doc, _ := goquery.NewDocumentFromReader(templateRawData)
+
+	var content string
+	var ruleErr error
+	funcs := reflect.ValueOf(&templates.Template{})
+	rulesDomain, contentRule := getPredefinedContentTemplateRules(entryUrl)
+	if contentRule != "" {
+		f := funcs.MethodByName(contentRule)
+		res := f.Call([]reflect.Value{reflect.ValueOf(doc)})
+		content = res[0].String()
+
+	} else {
+		contentRule = rules
+		if contentRule == "" {
+			rulesDomain, contentRule = getPredefinedScraperRules(entryUrl)
+		}
+		if contentRule != "" {
+			content, ruleErr = templates.ScrapContentUseRules(doc, rules)
+			if ruleErr != nil {
+				log.Printf(`get document by rule error rules:%s,domain:%s,%q`, rules, rulesDomain, ruleErr)
+				return "", ""
+			}
+		}
+	}
+	if content != "" {
+		content = rewrite.Rewriter(entryUrl, content, "add_dynamic_image")
+		content = sanitizer.Sanitize(entryUrl, content)
+	}
+	if content == "" {
+		content = templates.GetArticleByDivClass(doc)
+	}
+
+	if content == "" {
+		rawData := strings.NewReader(rawContent)
+		article, err := readability.FromReader(rawData, entryUrl)
+
+		if err != nil {
+			log.Printf(`article extractor error %q`, err)
+			return "", ""
+		}
+		content = article.Content
+	}
+
+	postFuncs := reflect.ValueOf(&postExtractor.PostExtractorTemplate{})
+	contentPreRule := getContentPostExtractorTemplateRules(entryUrl)
+	if content != "" && contentPreRule != "" {
+		f := postFuncs.MethodByName(contentPreRule)
+		res := f.Call([]reflect.Value{reflect.ValueOf(content), reflect.ValueOf(feedUrl)})
+		postContent := res[0].String()
+		if postContent != "" {
+			content = postContent
+		}
+	}
+	pureContent := getPureContent(content)
+	return content, pureContent
+}
+
 func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, isrecommend bool) (string, string, *time.Time, string, string, string, string, int64) {
 	var publishedAtTimeStamp int64 = 0
 	templateRawData := strings.NewReader(rawContent)
