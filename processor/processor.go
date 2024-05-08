@@ -82,7 +82,7 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 
 	rawData := strings.NewReader(rawContent)
 	article, err := readability.FromReader(rawData, entryUrl)
-
+	log.Printf("get readability article %s", entryUrl)
 	if err != nil {
 		log.Printf(`article extractor error %q`, err)
 		return "", "", nil, "", "", "", "", publishedAtTimeStamp
@@ -108,7 +108,7 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 		}*/
 	}
 
-	_, publishedAtRule := getPredefinedPublishedAtTimestampTemplateRules(entryUrl)
+	_,  := getPredefinedPublishedAtTimestampTemplateRules(entryUrl)
 	log.Printf("current publishedAtRule %s", publishedAtRule)
 	if publishedAtRule != "" {
 		f := funcs.MethodByName(publishedAtRule)
