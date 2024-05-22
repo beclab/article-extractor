@@ -182,6 +182,7 @@ var metadataTemplatePredefinedRules = map[string]string{
 	"cncf.io":             "CNCFScrapMetaData",
 	"time.com":            "TimeScrapMetaData",
 	"deepmind.google":     "DeepMindScrapMetaData",
+	"screenrant.com":      "ScreenrantScrapMetaData",
 }
 
 var publishedAtTimeStampTemplatePredefinedRules = map[string]string{
@@ -226,6 +227,7 @@ var publishedAtTimeStampTemplatePredefinedRules = map[string]string{
 	"nbcsports.com":       "NBCSportsPublishedAtTimeFromScriptMetadata",
 	"cncf.io":             "CNCFPublishedAtTimeFromScriptMetadata",
 	"deepmind.google":     "DeepMindPublishedAtTimeFromScriptMetadata",
+	"screenrant.com":      "ScreenrantPublishedAtTimeFromScriptMetadata",
 }
 
 func getPredefinedPublishedAtTimestampTemplateRules(websiteURL string) (string, string) {
