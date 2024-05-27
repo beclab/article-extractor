@@ -106,6 +106,8 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 				templateTime = &ptime
 			}
 		}*/
+	} else if !strings.HasPrefix(feedUrl, "wechat") {
+		author = templates.ScrapAuthorMetaData(doc)
 	}
 
 	_, publishedAtRule := getPredefinedPublishedAtTimestampTemplateRules(entryUrl)
@@ -115,6 +117,8 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 		res := f.Call([]reflect.Value{reflect.ValueOf(doc)})
 		publishedAtTimeStamp = res[0].Int()
 
+	} else if !strings.HasPrefix(feedUrl, "wechat") {
+		publishedAtTimeStamp = templates.ScrapPublishedAtTimeMetaData(doc)
 	}
 	if strings.HasPrefix(feedUrl, "wechat") {
 		publishedAtTimeStamp = GetPublishedAtTimestampForWechat(rawContent, entryUrl)
