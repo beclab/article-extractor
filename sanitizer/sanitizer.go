@@ -402,6 +402,7 @@ func isValidIframeSource(baseURL, src string) bool {
 func getTagAllowList() map[string][]string {
 	whitelist := make(map[string][]string)
 	whitelist["img"] = []string{"alt", "title", "src", "srcset", "sizes", "width", "height", "data-src"}
+	whitelist["amp-img"] = []string{}
 	whitelist["picture"] = []string{}
 	whitelist["audio"] = []string{"src"}
 	whitelist["video"] = []string{"poster", "height", "width", "src"}
