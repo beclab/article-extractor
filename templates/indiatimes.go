@@ -9,7 +9,7 @@ import (
 func (t *Template) IndiatimesScrapContent(document *goquery.Document) string {
 	contents := ""
 
-	document.Find("header,a,div.outsideInd").Each(func(i int, s *goquery.Selection) {
+	document.Find("header,div.outsideInd").Each(func(i int, s *goquery.Selection) {
 		RemoveNodes(s)
 	})
 	document.Find("strong").Each(func(i int, s *goquery.Selection) {

@@ -152,6 +152,20 @@ func addDynamicImage(entryURL, entryContent string) string {
 		}
 	})
 
+	ampSrcsetAttrs := []string{
+		"src",
+		"srcset",
+	}
+	doc.Find("amp-img").Each(func(i int, img *goquery.Selection) {
+		for _, attr := range ampSrcsetAttrs {
+			if srcAttr, found := img.Attr(attr); found {
+				img.ReplaceWithHtml(`<img src="` + srcAttr + `"/>`)
+				changed = true
+				break
+			}
+		}
+	})
+
 	if !changed {
 		doc.Find("noscript").Each(func(i int, noscript *goquery.Selection) {
 			matches := imgRegex.FindAllString(noscript.Text(), 2)

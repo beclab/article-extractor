@@ -7,7 +7,7 @@ import (
 func (t *Template) IndependentUKScrapContent(document *goquery.Document) string {
 
 	contents := ""
-	document.Find("div.newsletter-component,nav.topics,div.show-comments,div.lightbox").Each(func(i int, s *goquery.Selection) {
+	document.Find("aside,div.newsletter-component,nav.topics,div.show-comments,div.lightbox,div.iarFn").Each(func(i int, s *goquery.Selection) {
 		RemoveNodes(s)
 	})
 

@@ -149,6 +149,16 @@ var contentTemplatePredefinedRules = map[string]string{
 	"techradar.com":                "TechradarScrapContent",
 	"techspot.com":                 "TechspotScrapContent",
 	"news.mit.edu":                 "MITScrapContent",
+	"pagesix.com":                  "PagesixScrapContent",
+	"thedailybeast.com":            "ThedailybeastScrapContent",
+	"radiotimes.com":               "RadiotimesScrapContent",
+	"hollywoodreporter.com":        "HollywoodreporterScrapContent",
+	"usmagazine.com":               "UsmagazineScrapContent",
+	"thewrap.com":                  "ThewrapScrapContent",
+	"the-sun.com":                  "TheSunScrapContent",
+	"thesun.co.uk":                 "TheSunScrapContent",
+	"themirror.com":                "TheMirrorScrapContent",
+	//"screencrush.com":              "ScreencrushScrapContent",
 	/*"espn.com": "EspnScrapContent",
 	"nbcsports.com":      "NBCSportsScrapContent",
 	"deadspin.com":       "DeadspinScrapContent",
@@ -203,6 +213,7 @@ var metadataTemplatePredefinedRules = map[string]string{
 	"deadline.com":        "DeadlineScrapMetaData",
 	"variety.com":         "VarietyScrapMetaData",
 	"newatlas.com":        "NewatlasScrapMetaData",
+	"koreatimes.co.kr":    "KoreatimesScrapMetaData",
 }
 
 var publishedAtTimeStampTemplatePredefinedRules = map[string]string{
