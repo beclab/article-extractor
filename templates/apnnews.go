@@ -50,6 +50,20 @@ type ApNewsMetaData []struct {
 	Headline       string   `json:"headline"`
 }
 
+func (t *Template) ApNewsScrapContent(document *goquery.Document) string {
+	contents := ""
+	document.Find("div.Advertisement,div.Enhancement,div.ActionBar").Each(func(i int, s *goquery.Selection) {
+		RemoveNodes(s)
+	})
+
+	document.Find("div.Page-lead>figure,div.RichTextStoryBody").Each(func(i int, s *goquery.Selection) {
+		var content string
+		content, _ = goquery.OuterHtml(s)
+		contents += content
+	})
+	return contents
+}
+
 func (t *Template) ApNewsCommonGetPublishedAtTimestamp(document *goquery.Document) int64 {
 	var publishedAt int64 = 0
 	publishedAt = t.CommonGetPublishedAtTimestampSingleJson(document)

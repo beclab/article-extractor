@@ -45,52 +45,52 @@ func GetArticleByDivClass(document *goquery.Document) string {
 
 func ScrapAuthorMetaData(doc *goquery.Document) string {
 	author := ""
-	var authors []string
-	doc.Find("meta[name='author']").Each(func(i int, s *goquery.Selection) {
-		if author, exists := s.Attr("content"); exists {
-			if !checkStrArrContains(authors, author) {
-				authors = append(authors, author)
-			}
+	scriptSelector := "script[type=\"application/ld+json\"]"
+	doc.Find(scriptSelector).Each(func(i int, s *goquery.Selection) {
+		var authors []string
+		scriptContent := strings.TrimSpace(s.Text())
+		var metaData map[string]interface{}
+		unmarshalErr := json.Unmarshal([]byte(scriptContent), &metaData)
+		if unmarshalErr != nil {
+			log.Printf("convert  unmarshalError %v", unmarshalErr)
 		}
-	})
-	if len(authors) != 0 {
-		author = strings.Join(authors, " & ")
-	}
-	if author == "" {
-		scriptSelector := "script[type=\"application/ld+json\"]"
-		doc.Find(scriptSelector).Each(func(i int, s *goquery.Selection) {
-			scriptContent := strings.TrimSpace(s.Text())
-			var metaData map[string]interface{}
-			unmarshalErr := json.Unmarshal([]byte(scriptContent), &metaData)
-			if unmarshalErr != nil {
-				log.Printf("convert  unmarshalError %v", unmarshalErr)
-			}
-			if authorData, ok := metaData["author"]; ok {
-				switch authorData.(type) {
-				case []interface{}:
-					for _, authorDetail := range authorData.([]interface{}) {
-						authorMap := authorDetail.(map[string]interface{})
-						if authorName, ok := authorMap["name"]; ok {
-							a := authorName.(string)
-							if !checkStrArrContains(authors, a) {
-								authors = append(authors, a)
-							}
+		if authorData, ok := metaData["author"]; ok {
+			switch authorData.(type) {
+			case []interface{}:
+				for _, authorDetail := range authorData.([]interface{}) {
+					authorMap := authorDetail.(map[string]interface{})
+					if authorName, ok := authorMap["name"]; ok {
+						a := authorName.(string)
+						if !checkStrArrContains(authors, a) {
+							authors = append(authors, a)
 						}
 					}
-					if len(authors) > 0 {
-						author = strings.Join(authors, " & ")
-						return
-					}
-				case map[string]interface{}:
-					authorDetail := authorData.(map[string]interface{})
-					if authorName, ok := authorDetail["name"]; ok {
-						author = authorName.(string)
-						return
-					}
+				}
+				if len(authors) > 0 {
+					author = strings.Join(authors, " & ")
+				}
+			case map[string]interface{}:
+				authorDetail := authorData.(map[string]interface{})
+				if authorName, ok := authorDetail["name"]; ok {
+					author = authorName.(string)
 				}
 			}
+		}
 
+	})
+
+	if author == "" {
+		var authors []string
+		doc.Find("meta[name='author'],meta[property='author']").Each(func(i int, s *goquery.Selection) {
+			if author, exists := s.Attr("content"); exists {
+				if !checkStrArrContains(authors, author) {
+					authors = append(authors, author)
+				}
+			}
 		})
+		if len(authors) != 0 {
+			author = strings.Join(authors, " & ")
+		}
 	}
 	return author
 }
