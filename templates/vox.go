@@ -7,9 +7,9 @@ import (
 func (t *Template) VoxScrapContent(document *goquery.Document) string {
 	contents := ""
 
-	document.Find("div.duet--layout--rail,aside,div._1agbrixh").Each(func(i int, s *goquery.Selection) {
+	//_1jvzqea0 作者
+	document.Find("div.duet--layout--rail,aside,div._1agbrixh,div._1jvzqea0").Each(func(i int, s *goquery.Selection) {
 		RemoveNodes(s)
-
 	})
 	document.Find("div.duet--layout--entry-body-container").Each(func(i int, s *goquery.Selection) {
 		var content string

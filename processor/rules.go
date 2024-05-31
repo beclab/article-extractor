@@ -158,6 +158,8 @@ var contentTemplatePredefinedRules = map[string]string{
 	"the-sun.com":                  "TheSunScrapContent",
 	"thesun.co.uk":                 "TheSunScrapContent",
 	"themirror.com":                "TheMirrorScrapContent",
+	"dailymail.co.uk":              "DailymailScrapContent",
+	"ew.com":                       "EWScrapContent",
 	//"screencrush.com":              "ScreencrushScrapContent",
 	/*"espn.com": "EspnScrapContent",
 	"nbcsports.com":      "NBCSportsScrapContent",
