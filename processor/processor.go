@@ -2,9 +2,6 @@ package processor
 
 import (
 	"log"
-	"reflect"
-	"regexp"
-	"strconv"
 	"strings"
 	"time"
 
@@ -12,30 +9,22 @@ import (
 	"github.com/beclab/article-extractor/readability"
 	"github.com/beclab/article-extractor/rewrite"
 	"github.com/beclab/article-extractor/sanitizer"
-	"github.com/beclab/article-extractor/templates"
-	"github.com/beclab/article-extractor/templates/postExtractor"
 )
 
-func ArticleContentExtractor(rawContent, entryUrl, feedUrl, rules string) (string, string) {
+func ArticleContentExtractor(pluginsPath, rawContent, entryUrl, feedUrl, rules string) (string, string) {
 	templateRawData := strings.NewReader(rawContent)
 	doc, _ := goquery.NewDocumentFromReader(templateRawData)
 
-	var content string
-	var ruleErr error
-	funcs := reflect.ValueOf(&templates.Template{})
-	rulesDomain, contentRule := getPredefinedContentTemplateRules(entryUrl)
-	if contentRule != "" {
-		f := funcs.MethodByName(contentRule)
-		res := f.Call([]reflect.Value{reflect.ValueOf(doc)})
-		content = res[0].String()
-
-	} else {
-		contentRule = rules
+	content := getPluginsContent(pluginsPath, entryUrl, doc)
+	if content == "" {
+		var ruleErr error
+		var rulesDomain string
+		contentRule := rules
 		if contentRule == "" {
 			rulesDomain, contentRule = getPredefinedScraperRules(entryUrl)
 		}
 		if contentRule != "" {
-			content, ruleErr = templates.ScrapContentUseRules(doc, rules)
+			content, ruleErr = ScrapContentUseRules(doc, rules)
 			if ruleErr != nil {
 				log.Printf(`get document by rule error rules:%s,domain:%s,%q`, rules, rulesDomain, ruleErr)
 				return "", ""
@@ -45,9 +34,6 @@ func ArticleContentExtractor(rawContent, entryUrl, feedUrl, rules string) (strin
 	if content != "" {
 		content = rewrite.Rewriter(entryUrl, content, "add_dynamic_image")
 		content = sanitizer.Sanitize(entryUrl, content)
-	}
-	if content == "" {
-		content = templates.GetArticleByDivClass(doc)
 	}
 
 	if content == "" {
@@ -61,22 +47,15 @@ func ArticleContentExtractor(rawContent, entryUrl, feedUrl, rules string) (strin
 		content = article.Content
 	}
 
-	postFuncs := reflect.ValueOf(&postExtractor.PostExtractorTemplate{})
-	contentPreRule := getContentPostExtractorTemplateRules(entryUrl)
-	if content != "" && contentPreRule != "" {
-		f := postFuncs.MethodByName(contentPreRule)
-		res := f.Call([]reflect.Value{reflect.ValueOf(content), reflect.ValueOf(feedUrl)})
-		postContent := res[0].String()
-		if postContent != "" {
-			content = postContent
-		}
+	postContent := getPluginsPostContent(pluginsPath, entryUrl, content)
+	if postContent != "" {
+		content = postContent
 	}
 	pureContent := getPureContent(content)
 	return content, pureContent
 }
 
-func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, isrecommend bool) (string, string, *time.Time, string, string, string, string, int64) {
-	var publishedAtTimeStamp int64 = 0
+func ArticleReadabilityExtractor(pluginsPath, rawContent, entryUrl, feedUrl, rules string, isrecommend bool) (string, string, *time.Time, string, string, string, string, int64) {
 	templateRawData := strings.NewReader(rawContent)
 	doc, _ := goquery.NewDocumentFromReader(templateRawData)
 
@@ -85,89 +64,52 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 	log.Printf("get readability article %s", entryUrl)
 	if err != nil {
 		log.Printf(`article extractor error %q`, err)
-		return "", "", nil, "", "", "", "", publishedAtTimeStamp
+		return "", "", nil, "", "", "", "", 0
 	}
 
-	var content string
-	var author string
-	var ruleErr error
-
-	funcs := reflect.ValueOf(&templates.Template{})
-
-	_, metadataRule := getPredefinedMetaDataTemplateRules(entryUrl)
-	if metadataRule != "" {
-		f := funcs.MethodByName(metadataRule)
-		res := f.Call([]reflect.Value{reflect.ValueOf(doc)})
-		author = res[0].String()
-		/*published_at := res[1].String()
-		if published_at != "" {
-			ptime, parseErr := readability.ParseTime(published_at)
-			if parseErr != nil {
-				templateTime = &ptime
-			}
-		}*/
-	} else if !strings.HasPrefix(feedUrl, "wechat") {
-		author = templates.ScrapAuthorMetaData(doc)
+	author := getPluginsAuthor(pluginsPath, entryUrl, doc)
+	if author == "" && !strings.HasPrefix(feedUrl, "wechat") {
+		author = ScrapAuthorMetaData(doc)
 	}
 
-	_, publishedAtRule := getPredefinedPublishedAtTimestampTemplateRules(entryUrl)
-	log.Printf("current publishedAtRule %s", publishedAtRule)
-	if publishedAtRule != "" {
-		f := funcs.MethodByName(publishedAtRule)
-		res := f.Call([]reflect.Value{reflect.ValueOf(doc)})
-		publishedAtTimeStamp = res[0].Int()
-
-	} else if !strings.HasPrefix(feedUrl, "wechat") {
-		publishedAtTimeStamp = templates.ScrapPublishedAtTimeMetaData(doc)
+	publishedAtTimeStamp := getPluginsPublishedAtTemplate(pluginsPath, entryUrl, doc)
+	if publishedAtTimeStamp == 0 && !strings.HasPrefix(feedUrl, "wechat") {
+		publishedAtTimeStamp = ScrapAutoPublishedAtTimeMetaData(doc)
 	}
 	if strings.HasPrefix(feedUrl, "wechat") {
 		publishedAtTimeStamp = GetPublishedAtTimestampForWechat(rawContent, entryUrl)
 	}
 
-	rulesDomain, contentRule := getPredefinedContentTemplateRules(entryUrl)
-	if contentRule != "" {
-		f := funcs.MethodByName(contentRule)
-		res := f.Call([]reflect.Value{reflect.ValueOf(doc)})
-		content = res[0].String()
-
-	} else {
-		contentRule = rules
+	content := getPluginsContent(pluginsPath, entryUrl, doc)
+	if content == "" {
+		var ruleErr error
+		var rulesDomain string
+		contentRule := rules
 		if contentRule == "" {
 			rulesDomain, contentRule = getPredefinedScraperRules(entryUrl)
 		}
 		if contentRule != "" {
-			content, ruleErr = templates.ScrapContentUseRules(doc, rules)
+			content, ruleErr = ScrapContentUseRules(doc, rules)
 			if ruleErr != nil {
-				log.Printf(`get document by rule error rules:%s,domain:%s,%q`, rules, rulesDomain, err)
+				log.Printf(`get document by rule error rules:%s,domain:%s,%q`, rules, rulesDomain, ruleErr)
 				return "", "", nil, "", "", "", "", publishedAtTimeStamp
 			}
 		}
 	}
 	if content != "" {
-		//readability.InsertToFile("before_add_dynamic_image.html", content)
 		content = rewrite.Rewriter(entryUrl, content, "add_dynamic_image")
-
 		content = sanitizer.Sanitize(entryUrl, content)
-	}
-
-	if content == "" {
-		content = templates.GetArticleByDivClass(doc)
 	}
 
 	if content != "" {
 		article.Content = content
 	}
 
-	postFuncs := reflect.ValueOf(&postExtractor.PostExtractorTemplate{})
-	contentPreRule := getContentPostExtractorTemplateRules(entryUrl)
-	if contentPreRule != "" {
-		f := postFuncs.MethodByName(contentPreRule)
-		res := f.Call([]reflect.Value{reflect.ValueOf(article.Content), reflect.ValueOf(feedUrl)})
-		content := res[0].String()
-		if content != "" {
-			article.Content = content
-		}
+	postContent := getPluginsPostContent(pluginsPath, entryUrl, article.Content)
+	if postContent != "" {
+		article.Content = postContent
 	}
+
 	pureContent := getPureContent(article.Content)
 
 	return article.Content, pureContent, article.PublishedDate, article.Image, article.Title, author, article.Byline, publishedAtTimeStamp
@@ -182,23 +124,4 @@ func getPureContent(content string) string {
 		return pureText
 	}
 	return ""
-}
-
-func GetPublishedAtTimestampForWechat(rawContent string, url string) int64 {
-	var publishedAtTimestamp int64 = 0
-	re := regexp.MustCompile(`var oriCreateTime = '(\d+)';`)
-	match := re.FindStringSubmatch(rawContent)
-	if len(match) > 1 {
-		timestamp, err := strconv.ParseInt(match[1], 10, 64)
-		if err != nil {
-			log.Printf("can not parse timestamp [%s] for entry [%s]", match[1], url)
-			return publishedAtTimestamp
-		}
-		publishedAtTimestamp = timestamp
-	} else {
-		log.Printf("can not find timestamp for entry [%s]", url)
-		return publishedAtTimestamp
-	}
-	return publishedAtTimestamp
-
 }
