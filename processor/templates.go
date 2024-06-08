@@ -22,7 +22,7 @@ func getPluginsContent(pluginsPath, entryUrl string, doc *goquery.Document) stri
 		log.Printf(`open plugins error %s,%v`, pluginsPath, err)
 		return ""
 	}
-	templateExtr, err := p.Lookup("TepmateExtractor")
+	templateExtr, err := p.Lookup("ContentTemplateExtractor")
 	if err != nil {
 		log.Printf(`lookup plugins error %v`, err)
 		return ""
