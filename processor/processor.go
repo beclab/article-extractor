@@ -74,7 +74,7 @@ func ArticleContentExtractor(rawContent, entryUrl, feedUrl, rules string) (strin
 	return content, pureContent
 }
 
-func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, isrecommend bool) (string, string, *time.Time, string, string, string, string, int64) {
+func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, isrecommend bool) (string, string, *time.Time, string, string, int64, string, string, string) {
 	var publishedAtTimeStamp int64 = 0
 	templateRawData := strings.NewReader(rawContent)
 	doc, _ := goquery.NewDocumentFromReader(templateRawData)
@@ -84,12 +84,15 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 	log.Printf("get readability article %s", entryUrl)
 	if err != nil {
 		log.Printf(`article extractor error %q`, err)
-		return "", "", nil, "", "", "", "", publishedAtTimeStamp
+		return "", "", nil, "", "", publishedAtTimeStamp, "", "", ""
 	}
 
 	var content string
 	var author string
 	var ruleErr error
+	var mediaContent string
+	var mediaUrl string
+	var mediaType string
 
 	funcs := reflect.ValueOf(&templates.Template{})
 
@@ -107,6 +110,15 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 			}*/
 	} else if !strings.HasPrefix(feedUrl, "wechat") {
 		author = templates.ScrapAuthorMetaData(doc)
+	}
+
+	_, mediaRule := getPredefinedMediaScraperRules(entryUrl)
+	if mediaRule != "" {
+		f := funcs.MethodByName(mediaRule)
+		res := f.Call([]reflect.Value{reflect.ValueOf(entryUrl), reflect.ValueOf(doc)})
+		mediaContent = res[0].String()
+		mediaUrl = res[1].String()
+		mediaType = res[2].String()
 	}
 
 	_, publishedAtRule := getPredefinedPublishedAtTimestampTemplateRules(entryUrl)
@@ -138,7 +150,7 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 			content, ruleErr = templates.ScrapContentUseRules(doc, rules)
 			if ruleErr != nil {
 				log.Printf(`get document by rule error rules:%s,domain:%s,%q`, rules, rulesDomain, err)
-				return "", "", nil, "", "", "", "", publishedAtTimeStamp
+				return "", "", nil, "", "", publishedAtTimeStamp, "", "", ""
 			}
 		}
 	}
@@ -169,7 +181,7 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 	}
 	pureContent := getPureContent(article.Content)
 
-	return article.Content, pureContent, article.PublishedDate, article.Image, article.Title, author, article.Byline, publishedAtTimeStamp
+	return article.Content, pureContent, article.PublishedDate, article.Image, author, publishedAtTimeStamp, mediaContent, mediaUrl, mediaType
 }
 func getPureContent(content string) string {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(content))
