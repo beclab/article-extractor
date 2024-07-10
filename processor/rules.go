@@ -101,71 +101,88 @@ var contentTemplatePredefinedRules = map[string]string{
 	"dazeddigital.com": "DazeddigitalScrapContent",
 	"deadline.com":     "DeadlineScrapContent",
 	//"eonline.com":                   "EOnlineScrapContent",
-	"filmschoolrejects.com":        "FilmSchoolRejectsScrapContent",
-	"independent.co.uk":            "IndependentUKScrapContent",
-	"skysports.com":                "SkySportsScrapContent",
-	"sbnation.com":                 "SbnationScrapContent",
-	"cbssports.com":                "CBSsportsScrapContent",
-	"scmp.com":                     "SCMPScrapContent",
-	"cnn.com":                      "CNNScrapContent",
-	"businesslive.co.za":           "BusinessLiveScrapContent",
-	"smallbiztrends.com":           "SmallBizTrendsScrapContent",
-	"hbr.org":                      "HBRScrapContent",
-	"entrepreneur.com":             "EntrepreneurScrapContent",
-	"businessinsider.com":          "BusinessInsiderScrapContent",
-	"mattturck.com":                "MattturckScrapContent",
-	"cfainstitute.org":             "CFainstituteScrapContent",
-	"hunterwalk.com":               "HunterWalkScrapContent",
-	"thisisgoingtobebig.com":       "ThisisGoingtobeBIGScrapContent",
-	"ign.com":                      "IGNScrapContent",
-	"screenrant.com":               "ScreenrantScrapContent",
-	"vice.com":                     "ViceScrapContent",
-	"variety.com":                  "VarietyScrapContent",
-	"avclub.com":                   "AVClubScrapContent",
-	"stereogum.com":                "StereogumScrapContent",
-	"pitchfork.com":                "PitchForkScrapContent",
-	"geektyrant.com":               "GeektyrantScrapContent",
-	"advanced-television.com":      "AdTelevisionScrapContent",
-	"bleacherreport.com":           "BleadherReportScrapContent",
-	"foxsports.com":                "FoxSportsScrapContent",
-	"polygon.com":                  "PolygonScrapContent",
-	"kotaku.com":                   "KotakuScrapContent",
-	"tvline.com":                   "TVLineScrapContent",
-	"npr.org":                      "NprScrapContent",
-	"microsoft.com":                "MicrosoftScrapContent",
-	"benzinga.com":                 "BenzingaScrapContent",
-	"vox.com":                      "VoxScrapContent",
-	"financialpost.com":            "FinancialPostScrapContent",
-	"ibtimes.co.uk":                "IbtimesScrapContent",
-	"economictimes.indiatimes.com": "IndiatimesScrapContent",
-	"ycombinator.com":              "YcombinatorScrapContent",
-	"visualcapitalist.com":         "VisualcapitalistScrapContent",
-	"fastcompany.com":              "FastcompanyScrapContent",
-	"futurism.com":                 "FuturismScrapContent",
-	"gizmodo.com":                  "GizmodoScrapContent",
-	"interestingengineering.com":   "InterestingengineeringScrapContent",
-	"mirror.co.uk":                 "MirrorScrapContent",
-	"newatlas.com":                 "NewatlasScrapContent",
-	"techradar.com":                "TechradarScrapContent",
-	"techspot.com":                 "TechspotScrapContent",
-	"news.mit.edu":                 "MITScrapContent",
-	"pagesix.com":                  "PagesixScrapContent",
-	"thedailybeast.com":            "ThedailybeastScrapContent",
-	"radiotimes.com":               "RadiotimesScrapContent",
-	"hollywoodreporter.com":        "HollywoodreporterScrapContent",
-	"usmagazine.com":               "UsmagazineScrapContent",
-	"thewrap.com":                  "ThewrapScrapContent",
-	"the-sun.com":                  "TheSunScrapContent",
-	"thesun.co.uk":                 "TheSunScrapContent",
-	"themirror.com":                "TheMirrorScrapContent",
-	"dailymail.co.uk":              "DailymailScrapContent",
-	"ew.com":                       "EWScrapContent",
+	"filmschoolrejects.com":            "FilmSchoolRejectsScrapContent",
+	"independent.co.uk":                "IndependentUKScrapContent",
+	"skysports.com":                    "SkySportsScrapContent",
+	"sbnation.com":                     "SbnationScrapContent",
+	"cbssports.com":                    "CBSsportsScrapContent",
+	"scmp.com":                         "SCMPScrapContent",
+	"cnn.com":                          "CNNScrapContent",
+	"businesslive.co.za":               "BusinessLiveScrapContent",
+	"smallbiztrends.com":               "SmallBizTrendsScrapContent",
+	"hbr.org":                          "HBRScrapContent",
+	"entrepreneur.com":                 "EntrepreneurScrapContent",
+	"businessinsider.com":              "BusinessInsiderScrapContent",
+	"mattturck.com":                    "MattturckScrapContent",
+	"cfainstitute.org":                 "CFainstituteScrapContent",
+	"hunterwalk.com":                   "HunterWalkScrapContent",
+	"thisisgoingtobebig.com":           "ThisisGoingtobeBIGScrapContent",
+	"ign.com":                          "IGNScrapContent",
+	"screenrant.com":                   "ScreenrantScrapContent",
+	"vice.com":                         "ViceScrapContent",
+	"variety.com":                      "VarietyScrapContent",
+	"avclub.com":                       "AVClubScrapContent",
+	"stereogum.com":                    "StereogumScrapContent",
+	"pitchfork.com":                    "PitchForkScrapContent",
+	"geektyrant.com":                   "GeektyrantScrapContent",
+	"advanced-television.com":          "AdTelevisionScrapContent",
+	"bleacherreport.com":               "BleadherReportScrapContent",
+	"foxsports.com":                    "FoxSportsScrapContent",
+	"polygon.com":                      "PolygonScrapContent",
+	"kotaku.com":                       "KotakuScrapContent",
+	"tvline.com":                       "TVLineScrapContent",
+	"npr.org":                          "NprScrapContent",
+	"microsoft.com":                    "MicrosoftScrapContent",
+	"benzinga.com":                     "BenzingaScrapContent",
+	"vox.com":                          "VoxScrapContent",
+	"financialpost.com":                "FinancialPostScrapContent",
+	"ibtimes.co.uk":                    "IbtimesScrapContent",
+	"economictimes.indiatimes.com":     "IndiatimesScrapContent",
+	"ycombinator.com":                  "YcombinatorScrapContent",
+	"visualcapitalist.com":             "VisualcapitalistScrapContent",
+	"fastcompany.com":                  "FastcompanyScrapContent",
+	"futurism.com":                     "FuturismScrapContent",
+	"gizmodo.com":                      "GizmodoScrapContent",
+	"interestingengineering.com":       "InterestingengineeringScrapContent",
+	"mirror.co.uk":                     "MirrorScrapContent",
+	"newatlas.com":                     "NewatlasScrapContent",
+	"techradar.com":                    "TechradarScrapContent",
+	"techspot.com":                     "TechspotScrapContent",
+	"news.mit.edu":                     "MITScrapContent",
+	"pagesix.com":                      "PagesixScrapContent",
+	"thedailybeast.com":                "ThedailybeastScrapContent",
+	"radiotimes.com":                   "RadiotimesScrapContent",
+	"hollywoodreporter.com":            "HollywoodreporterScrapContent",
+	"usmagazine.com":                   "UsmagazineScrapContent",
+	"thewrap.com":                      "ThewrapScrapContent",
+	"the-sun.com":                      "TheSunScrapContent",
+	"thesun.co.uk":                     "TheSunScrapContent",
+	"themirror.com":                    "TheMirrorScrapContent",
+	"dailymail.co.uk":                  "DailymailScrapContent",
+	"ew.com":                           "EWScrapContent",
+	"storyfm.cn":                       "StoryFMScrapContent",
+	"bilibili.com":                     "BilibiliScrapContent",
+	"visualizemeditations.podbean.com": "PodBeanScrapContent",
+	"xiaoyuzhoufm.com":                 "XiaoyuzhouFMScrapContent",
+	"youtube.com":                      "YoutubeScrapContent",
+	"vimeo.com":                        "VimeoScrapContent",
+	"rumble.com":                       "RumbleScrapContent",
 	//"screencrush.com":              "ScreencrushScrapContent",
 	/*"espn.com": "EspnScrapContent",
 	"nbcsports.com":      "NBCSportsScrapContent",
 	"deadspin.com":       "DeadspinScrapContent",
 	"skynews.com":              "SkyNewsScrapContent",
 	*/
+}
+
+var mediaTemplatePredefinedRules = map[string]string{
+	"storyfm.cn":                       "StoryFMMediaContent",
+	"bilibili.com":                     "BilibiliMediaContent",
+	"visualizemeditations.podbean.com": "PodBeanMediaContent",
+	"xiaoyuzhoufm.com":                 "XiaoyuzhouFMMediaContent",
+	"youtube.com":                      "YoutubeMediaContent",
+	"vimeo.com":                        "VimeoMediaContent",
+	"rumble.com":                       "RumbleMediaContent",
 }
 
 var metadataTemplatePredefinedRules = map[string]string{
@@ -291,10 +308,10 @@ func getContentPostExtractorTemplateRules(websiteURL string) string {
 	return ""
 }
 
-func getPredefinedScraperRules(websiteURL string) (string, string) {
+func getPredefinedMediaScraperRules(websiteURL string) (string, string) {
 	urlDomain := domain(websiteURL)
 
-	for domain, rules := range contentPredefinedRules {
+	for domain, rules := range mediaTemplatePredefinedRules {
 		if strings.Contains(urlDomain, domain) {
 			return domain, rules
 		}
@@ -321,6 +338,17 @@ func getPredefinedMetaDataTemplateRules(websiteURL string) (string, string) {
 		}
 	}
 	for domain, rules := range metadataTemplatePredefinedRules {
+		if strings.Contains(urlDomain, domain) {
+			return domain, rules
+		}
+	}
+	return "", ""
+}
+
+func getPredefinedScraperRules(websiteURL string) (string, string) {
+	urlDomain := domain(websiteURL)
+
+	for domain, rules := range contentPredefinedRules {
 		if strings.Contains(urlDomain, domain) {
 			return domain, rules
 		}
