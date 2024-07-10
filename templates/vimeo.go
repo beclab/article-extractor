@@ -1,18 +1,30 @@
 package templates
 
 import (
+	"encoding/json"
+	"log"
 	"regexp"
+	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
 func (t *Template) VimeoScrapContent(document *goquery.Document) string {
 	contents := ""
-	document.Find("div.clip_details-description").Each(func(i int, s *goquery.Selection) {
-		var content string
-		content, _ = goquery.OuterHtml(s)
-		contents += content
+	scriptSelector := "script[type=\"application/ld+json\"]"
+	document.Find(scriptSelector).Each(func(i int, s *goquery.Selection) {
+		scriptContent := strings.TrimSpace(s.Text())
+		var metaData []map[string]interface{}
+		unmarshalErr := json.Unmarshal([]byte(scriptContent), &metaData)
+		if unmarshalErr != nil || len(metaData) < 1 {
+			log.Printf("convert  unmarshalError %v", unmarshalErr)
+		}
+		if description, ok := metaData[0]["description"]; ok {
+			contents = description.(string)
+		}
+
 	})
+
 	return contents
 }
 
