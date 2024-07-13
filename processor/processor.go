@@ -74,6 +74,23 @@ func ArticleContentExtractor(rawContent, entryUrl, feedUrl, rules string) (strin
 	return content, pureContent
 }
 
+func RadioDetectionInArticle(rawContent, url string) string {
+	templateRawData := strings.NewReader(rawContent)
+	doc, _ := goquery.NewDocumentFromReader(templateRawData)
+	funcs := reflect.ValueOf(&templates.Template{})
+	_, mediaRule := getPredefinedMediaScraperRules(url)
+	if mediaRule != "" {
+		f := funcs.MethodByName(mediaRule)
+		res := f.Call([]reflect.Value{reflect.ValueOf(url), reflect.ValueOf(doc)})
+		//mediaContent := res[0].String()
+		mediaUrl := res[1].String()
+		mediaType := res[2].String()
+		if mediaType == "audio" {
+			return mediaUrl
+		}
+	}
+	return ""
+}
 func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, isrecommend bool) (string, string, *time.Time, string, string, int64, string, string, string) {
 	var publishedAtTimeStamp int64 = 0
 	templateRawData := strings.NewReader(rawContent)
