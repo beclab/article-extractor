@@ -1,14 +1,16 @@
 package templates
 
 import (
-	"encoding/json"
-	"log"
 
 	//"log"
+
+	"encoding/json"
+	"log"
 	"strings"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/beclab/article-extractor/readability"
 )
 
 type ApNewsMetaData []struct {
@@ -66,116 +68,59 @@ func (t *Template) ApNewsScrapContent(document *goquery.Document) string {
 
 func (t *Template) ApNewsCommonGetPublishedAtTimestamp(document *goquery.Document) int64 {
 	var publishedAt int64 = 0
-	publishedAt = t.CommonGetPublishedAtTimestampSingleJson(document)
-	if publishedAt == 0 {
-		publishedAt = t.ApNewsPublishedAtTimeFromScriptMetadata(document)
-	}
-	return publishedAt
-
-}
-
-func (t *Template) ApNewsPublishedAtTimeFromScriptMetadata(document *goquery.Document) int64 {
-	var publishedAt int64 = 0
-	scriptSelectorFirst := "head > script[type=\"application/ld+json\"]"
-	scriptSelectorSecond := "body > script[type=\"application/ld+json\"]"
-	scriptSelectorThird := "script[type=\"application/ld+json\"]"
-
-	scriptSelectorList := make([]string, 100)
-	scriptSelectorList = append(scriptSelectorList, scriptSelectorFirst)
-	scriptSelectorList = append(scriptSelectorList, scriptSelectorSecond)
-	scriptSelectorList = append(scriptSelectorList, scriptSelectorThird)
-
-	for _, scriptSelector := range scriptSelectorList {
-
-		document.Find(scriptSelector).Each(func(i int, s *goquery.Selection) {
-			if publishedAt != 0 {
-				return
-			}
-			scriptContent := strings.TrimSpace(s.Text())
-			var firstTypeMetaData ApNewsMetaData
-			unmarshalErr := json.Unmarshal([]byte(scriptContent), &firstTypeMetaData)
-			if unmarshalErr != nil {
-				log.Printf("convert ApNewsMetaData unmarshalError %v", unmarshalErr)
-				return
-
-			}
-			firstElement := firstTypeMetaData[0]
-			publishedAt = firstElement.DateModified.Unix()
-
-			// var jsonMap map[string]interface{}
-
-			// logger.Info("script content %s  author length %d",scriptContent, len(currentDWMetadata.Author))
-		})
-		if publishedAt != 0 {
-			break
+	s := document.Find("meta[property='article:published_time']").First()
+	timeStr, exists := s.Attr("content")
+	if exists {
+		ptime, parseErr := readability.ParseTime(timeStr)
+		if parseErr == nil {
+			return ptime.Unix()
 		}
 	}
 	return publishedAt
 
-}
-
-func (t *Template) ApNewsAuthorExtractFromScriptMetadata(document *goquery.Document) (string, string) {
-
-	author := ""
-	published_at := ""
-	scriptSelectorFirst := "head > script[type=\"application/ld+json\"]"
-	scriptSelectorSecond := "body > script[type=\"application/ld+json\"]"
-	scriptSelectorThird := "script[type=\"application/ld+json\"]"
-
-	scriptSelectorList := make([]string, 100)
-	scriptSelectorList = append(scriptSelectorList, scriptSelectorFirst)
-	scriptSelectorList = append(scriptSelectorList, scriptSelectorSecond)
-	scriptSelectorList = append(scriptSelectorList, scriptSelectorThird)
-
-	for _, scriptSelector := range scriptSelectorList {
-
-		document.Find(scriptSelector).Each(func(i int, s *goquery.Selection) {
-			if author != "" {
-				return
-			}
-			scriptContent := strings.TrimSpace(s.Text())
-			var firstTypeMetaData ApNewsMetaData
-			unmarshalErr := json.Unmarshal([]byte(scriptContent), &firstTypeMetaData)
-			if unmarshalErr != nil {
-				log.Printf("convert ApNewsMetaData unmarshalError %v", unmarshalErr)
-				return
-
-			}
-			firstElement := firstTypeMetaData[0]
-			for currentIndex, currentAuthor := range firstElement.Author {
-
-				if currentIndex != 0 {
-					author += " & "
-				}
-				log.Printf("author Name: ", currentAuthor.Name)
-				author += currentAuthor.Name
-			}
-
-			// var jsonMap map[string]interface{}
-
-			// logger.Info("script content %s  author length %d",scriptContent, len(currentDWMetadata.Author))
-		})
-		if author != "" {
-			break
-		}
-	}
-	log.Printf("author last: %s", author)
-	return author, published_at
 }
 
 func (t *Template) ApnNewsScrapMetaData(document *goquery.Document) (string, string) {
 	author := ""
 	published_at := ""
-	author, published_at = t.AuthorExtractFromScriptMetadata(document)
-	if author == "" {
-		author, published_at = t.AuthorExtractFromScriptMetadata(document)
-	}
-	if author == "" {
-		author, published_at = t.ApNewsAuthorExtractFromScriptMetadata(document)
-	}
-	if author == "" {
-		author = "AP News"
-	}
+
+	scriptSelector := "script[type=\"application/ld+json\"]"
+	document.Find(scriptSelector).Each(func(i int, s *goquery.Selection) {
+		var authors []string
+		scriptContent := strings.TrimSpace(s.Text())
+		var metaDatas []map[string]interface{}
+		unmarshalErr := json.Unmarshal([]byte(scriptContent), &metaDatas)
+		if unmarshalErr != nil {
+			log.Printf("convert  unmarshalError %v", unmarshalErr)
+		}
+		for _, metaData := range metaDatas {
+			if authorData, ok := metaData["author"]; ok {
+				switch authorData.(type) {
+				case []interface{}:
+					for _, authorDetail := range authorData.([]interface{}) {
+						authorMap := authorDetail.(map[string]interface{})
+						if authorName, ok := authorMap["name"]; ok {
+							a := authorName.(string)
+							if !checkStrArrContains(authors, a) {
+								authors = append(authors, a)
+							}
+						}
+					}
+					if len(authors) > 0 {
+						author = strings.Join(authors, " & ")
+					}
+				case map[string]interface{}:
+					authorDetail := authorData.(map[string]interface{})
+					if authorName, ok := authorDetail["name"]; ok {
+						author = authorName.(string)
+					}
+				}
+			}
+		}
+		if author != "" {
+			return
+		}
+	})
 
 	return author, published_at
 }
