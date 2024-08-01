@@ -11,6 +11,9 @@ import (
 func (t *Template) PodBeanScrapContent(document *goquery.Document) string {
 	contents := ""
 
+	document.Find("div.episode-detail-top,div.cc-post-toolbar").Each(func(i int, s *goquery.Selection) {
+		RemoveNodes(s)
+	})
 	document.Find("div.episode-content").Each(func(i int, s *goquery.Selection) {
 		var content string
 		content, _ = goquery.OuterHtml(s)
