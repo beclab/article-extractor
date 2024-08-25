@@ -168,6 +168,8 @@ var contentTemplatePredefinedRules = map[string]string{
 	"vimeo.com":                    "VimeoScrapContent",
 	"rumble.com":                   "RumbleScrapContent",
 	"spreaker.com":                 "SpreakerScrapContent",
+	"pinterest.com":                "PinterestScrapContent",
+	"acfun.cn":                     "ACFunScrapContent",
 	//"screencrush.com":              "ScreencrushScrapContent",
 	/*"espn.com": "EspnScrapContent",
 	"nbcsports.com":      "NBCSportsScrapContent",
@@ -185,6 +187,8 @@ var mediaTemplatePredefinedRules = map[string]string{
 	"vimeo.com":        "VimeoMediaContent",
 	"rumble.com":       "RumbleMediaContent",
 	"spreaker.com":     "SpreakerMediaContent",
+	"pinterest.com":    "PinterestMediaContent",
+	"acfun.cn":         "ACFunMediaContent",
 }
 
 var metadataTemplatePredefinedRules = map[string]string{
@@ -235,6 +239,8 @@ var metadataTemplatePredefinedRules = map[string]string{
 	"variety.com":         "VarietyScrapMetaData",
 	"newatlas.com":        "NewatlasScrapMetaData",
 	"koreatimes.co.kr":    "KoreatimesScrapMetaData",
+	"pinterest.com":       "PinterestScrapMetaData",
+	"acfun.cn":            "ACFunScrapMetaData",
 }
 
 var publishedAtTimeStampTemplatePredefinedRules = map[string]string{
@@ -283,6 +289,7 @@ var publishedAtTimeStampTemplatePredefinedRules = map[string]string{
 	"deadline.com":               "DeadlinePublishedAtTimeFromScriptMetadata",
 	"variety.com":                "VarietyPublishedAtTimeFromScriptMetadata",
 	"interestingengineering.com": "InterestingengineeringPublishedAtTimeFromScriptMetadata",
+	"acfun.cn":                   "ACFunPublishedAtTimeFromScriptMetadata",
 }
 
 func getPredefinedPublishedAtTimestampTemplateRules(websiteURL string) (string, string) {

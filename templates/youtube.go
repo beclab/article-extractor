@@ -34,3 +34,40 @@ func (t *Template) YoutubeMediaContent(url string, document *goquery.Document) (
 	return "", "", ""
 
 }
+
+func (t *Template) YoutubeScrapMetaData(document *goquery.Document) (string, string) {
+
+	author := ""
+	published_at := ""
+	/*scriptSelector := "script[type=\"application/ld+json\"]"
+	document.Find(scriptSelector).Each(func(i int, s *goquery.Selection) {
+		scriptContent := strings.TrimSpace(s.Text())
+		var metaData map[string]interface{}
+		unmarshalErr := json.Unmarshal([]byte(scriptContent), &metaData)
+		if unmarshalErr != nil {
+			log.Printf("convert  unmarshalError %v", unmarshalErr)
+		}
+		if _, ok := metaData["author"]; ok {
+			author = metaData["author"].(string)
+			return
+		}
+
+	})*/
+
+	return author, published_at
+}
+
+func (t *Template) YoutubePublishedAtTimeFromScriptMetadata(doc *goquery.Document) int64 {
+	var publishedAt int64 = 0
+
+	/*s := doc.Find("meta[itemprop='datePublished']").First()
+	timeStr, exists := s.Attr("content")
+	if exists {
+		ptime, parseErr := readability.ParseTime(timeStr)
+		if parseErr == nil {
+			return ptime.Unix()
+		}
+	}*/
+
+	return publishedAt
+}
