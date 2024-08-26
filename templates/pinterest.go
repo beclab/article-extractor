@@ -30,7 +30,7 @@ func (t *Template) PinterestMediaContent(url string, document *goquery.Document)
 	contents := ""
 	embedUrl := ""
 	mediaType := ""
-	document.Find("div[data-test-id=closeup-video-with-visibility]").Each(func(i int, s *goquery.Selection) {
+	document.Find("video").Each(func(i int, s *goquery.Selection) {
 		embedUrl = url
 		mediaType = "video"
 	})

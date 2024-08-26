@@ -182,7 +182,7 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 		content = templates.GetArticleByDivClass(doc)
 	}
 
-	if content != "" {
+	if content != "" || mediaType != "" {
 		article.Content = content
 	}
 
