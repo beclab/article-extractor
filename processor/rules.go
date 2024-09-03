@@ -170,6 +170,8 @@ var contentTemplatePredefinedRules = map[string]string{
 	"spreaker.com":                 "SpreakerScrapContent",
 	"pinterest.com":                "PinterestScrapContent",
 	"acfun.cn":                     "ACFunScrapContent",
+	"wsj.com":                      "WsjScrapContent",
+	"ft.com":                       "FTScrapContent",
 	//"screencrush.com":              "ScreencrushScrapContent",
 	/*"espn.com": "EspnScrapContent",
 	"nbcsports.com":      "NBCSportsScrapContent",
