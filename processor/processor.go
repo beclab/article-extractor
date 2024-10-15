@@ -101,7 +101,7 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 	log.Printf("get readability article %s", entryUrl)
 	if err != nil {
 		log.Printf(`article extractor error %q`, err)
-		return "", "", nil, "", "", publishedAtTimeStamp, "", "", ""
+		return "", "", nil, "", "", "", publishedAtTimeStamp, "", "", ""
 	}
 
 	var content string
@@ -167,7 +167,7 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 			content, ruleErr = templates.ScrapContentUseRules(doc, rules)
 			if ruleErr != nil {
 				log.Printf(`get document by rule error rules:%s,domain:%s,%q`, rules, rulesDomain, err)
-				return "", "", nil, "", "", publishedAtTimeStamp, "", "", ""
+				return "", "", nil, "", "", "", publishedAtTimeStamp, "", "", ""
 			}
 		}
 	}
