@@ -91,7 +91,7 @@ func RadioDetectionInArticle(rawContent, url string) string {
 	}
 	return ""
 }
-func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, isrecommend bool) (string, string, *time.Time, string, string, int64, string, string, string) {
+func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, isrecommend bool) (string, string, *time.Time, string, string, string, int64, string, string, string) {
 	var publishedAtTimeStamp int64 = 0
 	templateRawData := strings.NewReader(rawContent)
 	doc, _ := goquery.NewDocumentFromReader(templateRawData)
@@ -198,7 +198,7 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 	}
 	pureContent := getPureContent(article.Content)
 
-	return article.Content, pureContent, article.PublishedDate, article.Image, author, publishedAtTimeStamp, mediaContent, mediaUrl, mediaType
+	return article.Content, pureContent, article.PublishedDate, article.Image, article.Title, author, publishedAtTimeStamp, mediaContent, mediaUrl, mediaType
 }
 func getPureContent(content string) string {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(content))

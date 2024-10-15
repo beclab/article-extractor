@@ -8,7 +8,6 @@ import (
 
 func (t *Template) YoutubeScrapContent(document *goquery.Document) string {
 	contents := ""
-
 	/*document.Find("#description-inline-expander").Each(func(i int, s *goquery.Selection) {
 		var content string
 		content, _ = goquery.OuterHtml(s)
