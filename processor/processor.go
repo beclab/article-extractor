@@ -96,6 +96,7 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 	templateRawData := strings.NewReader(rawContent)
 	doc, _ := goquery.NewDocumentFromReader(templateRawData)
 
+	entryDomain := domain(entryUrl)
 	rawData := strings.NewReader(rawContent)
 	article, err := readability.FromReader(rawData, entryUrl)
 	log.Printf("get readability article %s", entryUrl)
@@ -198,8 +199,12 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 	}
 	pureContent := getPureContent(article.Content)
 
+	if strings.Contains(entryDomain, "notion.site") {
+		article.Title = doc.Find("title").Text()
+	}
 	return article.Content, pureContent, article.PublishedDate, article.Image, article.Title, author, publishedAtTimeStamp, mediaContent, mediaUrl, mediaType
 }
+
 func getPureContent(content string) string {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(content))
 	if err == nil {
