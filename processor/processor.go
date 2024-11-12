@@ -176,7 +176,12 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 		//readability.InsertToFile("before_add_dynamic_image.html", content)
 		content = rewrite.Rewriter(entryUrl, content, "add_dynamic_image")
 
-		content = sanitizer.Sanitize(entryUrl, content)
+		if strings.Contains(entryDomain, "notion.site") {
+			article.Title = doc.Find("title").Text()
+		} else {
+			content = sanitizer.Sanitize(entryUrl, content)
+		}
+
 	}
 
 	if content == "" {
@@ -199,9 +204,6 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 	}
 	pureContent := getPureContent(article.Content)
 
-	if strings.Contains(entryDomain, "notion.site") {
-		article.Title = doc.Find("title").Text()
-	}
 	return article.Content, pureContent, article.PublishedDate, article.Image, article.Title, author, publishedAtTimeStamp, mediaContent, mediaUrl, mediaType
 }
 
