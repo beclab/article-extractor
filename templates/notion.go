@@ -10,7 +10,7 @@ func (t *Template) NotionScrapContent(document *goquery.Document) string {
 	/*document.Find("aside,div.o-ads").Each(func(i int, s *goquery.Selection) {
 		RemoveNodes(s)
 	})*/
-	document.Find("div.notion-page-content").Each(func(i int, s *goquery.Selection) {
+	document.Find("div.page-body").Each(func(i int, s *goquery.Selection) {
 		var content string
 		content, _ = goquery.OuterHtml(s)
 		contents += content
