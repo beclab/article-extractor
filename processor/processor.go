@@ -1,6 +1,8 @@
 package processor
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"reflect"
 	"regexp"
@@ -203,10 +205,71 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 		}
 	}
 	pureContent := getPureContent(article.Content)
+	checkArticleImage := getArticleImage(rawContent, entryUrl)
+	if checkArticleImage != "" {
+		article.Image = checkArticleImage
+	}
 
 	return article.Content, pureContent, article.PublishedDate, article.Image, article.Title, author, publishedAtTimeStamp, mediaContent, mediaUrl, mediaType
 }
 
+func getArticleImage(content, url string) string {
+	articleImage := ""
+	if strings.Contains(url, "bilibili.com/bangumi/play") {
+		ep := ""
+		re := regexp.MustCompile(`play/ep(\d+)`)
+		match := re.FindStringSubmatch(url)
+		if len(match) > 1 {
+			ep = match[1]
+		}
+		log.Printf("get bili bangumi image:%s", ep)
+		if ep != "" {
+			doc, _ := goquery.NewDocumentFromReader(strings.NewReader(content))
+			var session interface{}
+			doc.Find("script[type='application/json']").Each(func(i int, s *goquery.Selection) {
+				scriptContent := strings.TrimSpace(s.Text())
+				var metaData map[string]interface{}
+				unmarshalErr := json.Unmarshal([]byte(scriptContent), &metaData)
+				if unmarshalErr != nil {
+					log.Printf("convert  unmarshalError %v", unmarshalErr)
+					return
+				}
+				if props, ok := metaData["props"]; ok {
+					if pageProps, ok := props.(map[string]interface{})["pageProps"]; ok {
+						if dehydratedState, ok := pageProps.(map[string]interface{})["dehydratedState"]; ok {
+							if queries, ok := dehydratedState.(map[string]interface{})["queries"]; ok {
+								queriesArr := queries.([]interface{})
+								if len(queriesArr) > 1 {
+									if state, ok := queriesArr[1].(map[string]interface{})["state"]; ok {
+										if stateData, ok := state.(map[string]interface{})["data"]; ok {
+											session = stateData.(map[string]interface{})["seasons"]
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			})
+			if session != nil {
+				for _, seasonDetail := range session.([]interface{}) {
+					sessionMap := seasonDetail.(map[string]interface{})
+					if new_ep, ok := sessionMap["new_ep"]; ok {
+						new_ep_data := new_ep.(map[string]interface{})
+						id, idok := new_ep_data["id"]
+						cover, coverok := new_ep_data["cover"]
+						idstr := fmt.Sprintf("%.0f", id.(float64))
+						if idok && coverok && idstr == ep {
+							articleImage = cover.(string)
+							return articleImage
+						}
+					}
+				}
+			}
+		}
+	}
+	return articleImage
+}
 func getPureContent(content string) string {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(content))
 	if err == nil {
