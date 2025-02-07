@@ -14,3 +14,13 @@ func (t *Template) ZhihuScrapContent(document *goquery.Document) string {
 	})
 	return contents
 }
+
+func (t *Template) ZhihuScrapMetaData(document *goquery.Document) (string, string) {
+
+	author := ""
+	published_at := ""
+	document.Find("span.AuthorInfo-name>a").Each(func(i int, s *goquery.Selection) {
+		author = s.Text()
+	})
+	return author, published_at
+}

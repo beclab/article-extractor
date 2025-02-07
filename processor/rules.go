@@ -245,6 +245,7 @@ var metadataTemplatePredefinedRules = map[string]string{
 	"koreatimes.co.kr":    "KoreatimesScrapMetaData",
 	"pinterest.com":       "PinterestScrapMetaData",
 	"acfun.cn":            "ACFunScrapMetaData",
+	"zhihu.com":           "ZhihuScrapMetaData",
 }
 
 var publishedAtTimeStampTemplatePredefinedRules = map[string]string{
