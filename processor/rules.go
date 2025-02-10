@@ -173,6 +173,7 @@ var contentTemplatePredefinedRules = map[string]string{
 	"wsj.com":                      "WsjScrapContent",
 	"ft.com":                       "FTScrapContent",
 	"notion.site":                  "NotionScrapContent",
+	"zhihu.com":                    "ZhihuScrapContent",
 	//"screencrush.com":              "ScreencrushScrapContent",
 	/*"espn.com": "EspnScrapContent",
 	"nbcsports.com":      "NBCSportsScrapContent",
@@ -244,6 +245,7 @@ var metadataTemplatePredefinedRules = map[string]string{
 	"koreatimes.co.kr":    "KoreatimesScrapMetaData",
 	"pinterest.com":       "PinterestScrapMetaData",
 	"acfun.cn":            "ACFunScrapMetaData",
+	"zhihu.com":           "ZhihuScrapMetaData",
 }
 
 var publishedAtTimeStampTemplatePredefinedRules = map[string]string{
