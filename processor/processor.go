@@ -16,6 +16,28 @@ import (
 	"github.com/beclab/article-extractor/templates/postExtractor"
 )
 
+func getRulesFromContent(websiteURL string, doc *goquery.Document) string {
+	urlDomain := domain(websiteURL)
+	isSubstack := false
+	if strings.Contains(urlDomain, "substack.com") || doc.Find(`link[rel="preconnect"][href="https://substackcdn.com"]`).Length() > 0 {
+		isSubstack = true
+	}
+	if isSubstack {
+		return "SubStackScrapContent"
+	}
+	/*isGhost := false
+	content, exists := doc.Find(`meta[name="generator"]`).Attr("content")
+	if exists {
+		if strings.HasPrefix(content, "Ghost") && doc.Find("section.gh-content").Length() > 0 {
+			isGhost = true
+		}
+	}
+
+	if isGhost {
+		return "GhostScrapContent"
+	}*/
+	return ""
+}
 func ArticleContentExtractor(rawContent, entryUrl, feedUrl, rules string) (string, string) {
 	templateRawData := strings.NewReader(rawContent)
 	doc, _ := goquery.NewDocumentFromReader(templateRawData)
@@ -23,7 +45,11 @@ func ArticleContentExtractor(rawContent, entryUrl, feedUrl, rules string) (strin
 	var content string
 	var ruleErr error
 	funcs := reflect.ValueOf(&templates.Template{})
-	rulesDomain, contentRule := getPredefinedContentTemplateRules(entryUrl)
+	rulesDomain := ""
+	contentRule := getRulesFromContent(entryUrl, doc)
+	if contentRule == "" {
+		rulesDomain, contentRule = getPredefinedContentTemplateRules(entryUrl)
+	}
 	if contentRule != "" {
 		f := funcs.MethodByName(contentRule)
 		res := f.Call([]reflect.Value{reflect.ValueOf(doc)})
@@ -153,7 +179,11 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 		publishedAtTimeStamp = GetPublishedAtTimestampForWechat(rawContent, entryUrl)
 	}
 
-	rulesDomain, contentRule := getPredefinedContentTemplateRules(entryUrl)
+	rulesDomain := ""
+	contentRule := getRulesFromContent(entryUrl, doc)
+	if contentRule == "" {
+		rulesDomain, contentRule = getPredefinedContentTemplateRules(entryUrl)
+	}
 	if contentRule != "" {
 		f := funcs.MethodByName(contentRule)
 		res := f.Call([]reflect.Value{reflect.ValueOf(doc)})
