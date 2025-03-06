@@ -197,6 +197,7 @@ var mediaTemplatePredefinedRules = map[string]string{
 	"spreaker.com":     "SpreakerMediaContent",
 	"pinterest.com":    "PinterestMediaContent",
 	"acfun.cn":         "ACFunMediaContent",
+	"reddit.com":       "RedditMediaContent",
 }
 
 var metadataTemplatePredefinedRules = map[string]string{
@@ -250,6 +251,7 @@ var metadataTemplatePredefinedRules = map[string]string{
 	"pinterest.com":       "PinterestScrapMetaData",
 	"acfun.cn":            "ACFunScrapMetaData",
 	"zhihu.com":           "ZhihuScrapMetaData",
+	"reddit.com":          "RedditScrapMetaData",
 }
 
 var publishedAtTimeStampTemplatePredefinedRules = map[string]string{
@@ -299,6 +301,7 @@ var publishedAtTimeStampTemplatePredefinedRules = map[string]string{
 	"variety.com":                "VarietyPublishedAtTimeFromScriptMetadata",
 	"interestingengineering.com": "InterestingengineeringPublishedAtTimeFromScriptMetadata",
 	"acfun.cn":                   "ACFunPublishedAtTimeFromScriptMetadata",
+	"reddit.com":                 "RedditPublishedAtTimeFromScriptMetadata",
 }
 
 func getPredefinedPublishedAtTimestampTemplateRules(websiteURL string) (string, string) {
