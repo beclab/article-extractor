@@ -212,12 +212,6 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 		} else {
 			content = sanitizer.Sanitize(entryUrl, content)
 		}
-
-		if strings.Contains(entryDomain, "reddit.com") {
-			title := doc.Find("h1[slot='title']").Text()
-			article.Title = strings.TrimSpace(title)
-		}
-
 	}
 
 	if content == "" {
@@ -244,6 +238,13 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 		article.Image = checkArticleImage
 	}*/
 
+	if strings.Contains(entryDomain, "reddit.com") {
+		doc.Find("shreddit-post").Each(func(i int, s *goquery.Selection) {
+			if title, exists := s.Attr("post-title"); exists {
+				article.Title = strings.TrimSpace(title)
+			}
+		})
+	}
 	return article.Content, pureContent, article.PublishedDate, article.Image, article.Title, author, publishedAtTimeStamp, mediaContent, mediaUrl, mediaType
 }
 
