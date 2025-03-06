@@ -207,9 +207,15 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 		content = rewrite.Rewriter(entryUrl, content, "add_dynamic_image")
 
 		if strings.Contains(entryDomain, "notion.site") {
+			//notion 不进行santitize
 			article.Title = doc.Find("title").Text()
 		} else {
 			content = sanitizer.Sanitize(entryUrl, content)
+		}
+
+		if strings.Contains(entryDomain, "reddit.com") {
+			title := doc.Find("h1[slot='title']").Text()
+			article.Title = strings.TrimSpace(title)
 		}
 
 	}
