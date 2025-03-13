@@ -31,13 +31,13 @@ func (t *Template) QuoraScrapContent(document *goquery.Document) string {
 					child := ccc1.Eq(0)
 					content, err := child.Html()
 					if err == nil {
-						contents += "<div class='quora-item'><span class='q-author'>" + author + "</span>" + content + "</div>"
+						contents += "<div class='quora-item'><span class='q-author'><strong>" + author + "</strong></span>" + content + "<br></div>"
 					}
 				} else if ccc1.Length() > 1 {
 					child := ccc1.Eq(1)
 					content, err := child.Html()
 					if err == nil {
-						contents += "<div class='quora-item'><span class='q-author'>" + author + "</span>" + content + "</div>"
+						contents += "<div class='quora-item'><span class='q-author'><strong>" + author + "</strong></span>" + content + "<br></div>"
 					}
 
 				}
