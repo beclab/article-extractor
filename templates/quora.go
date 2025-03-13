@@ -12,7 +12,9 @@ func (t *Template) QuoraScrapContent(document *goquery.Document) string {
 
 	document.Find("div.puppeteer_test_answer_content").Each(func(i int, s *goquery.Selection) {
 		parent := s.Parent()
-		if parent.Find("div.spacing_log_originally_answered_banner").Length() == 0 {
+		otherAnswer := parent.Find("div.spacing_log_originally_answered_banner").Length()
+		relativeAnswer := parent.Find("div.puppeteer_test_question_title").Length() + parent.Find("span.puppeteer_test_question_title").Length()
+		if otherAnswer == 0 && relativeAnswer == 0 {
 			author := ""
 			prevNode := s.Prev()
 			if prevNode.Length() > 0 {
