@@ -6,6 +6,9 @@ import (
 
 func (t *Template) QuoraScrapContent(document *goquery.Document) string {
 	contents := ""
+	document.Find("div.spacing_log_question_page_ad").Each(func(i int, s *goquery.Selection) {
+		RemoveNodes(s)
+	})
 
 	document.Find("div.puppeteer_test_answer_content").Each(func(i int, s *goquery.Selection) {
 		parent := s.Parent()
