@@ -45,7 +45,7 @@ func (t *Template) RedditScrapMetaData(document *goquery.Document) (string, stri
 	published_at := ""
 
 	document.Find("shreddit-post").Each(func(i int, s *goquery.Selection) {
-		if content, exists := s.Attr("subreddit-prefixed-name"); exists {
+		if content, exists := s.Attr("author"); exists {
 			author = content
 		}
 	})
