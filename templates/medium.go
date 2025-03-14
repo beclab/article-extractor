@@ -4,7 +4,8 @@ import "github.com/PuerkitoBio/goquery"
 
 func (t *Template) MediumScrapContent(document *goquery.Document) string {
 
-	document.Find("h1.pw-post-title,h2.pw-subtitle-paragraph,div.speechify-ignore").Each(func(i int, s *goquery.Selection) {
+	//document.Find("h1.pw-post-title,h2.pw-subtitle-paragraph,div.speechify-ignore").Each(func(i int, s *goquery.Selection) {
+	document.Find("h1.pw-post-title,div.speechify-ignore").Each(func(i int, s *goquery.Selection) {
 		RemoveNodes(s)
 	})
 
