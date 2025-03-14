@@ -1,6 +1,8 @@
 package templates
 
 import (
+	"log"
+
 	"github.com/PuerkitoBio/goquery"
 )
 
@@ -12,7 +14,11 @@ func (t *Template) QuoraScrapContent(document *goquery.Document) string {
 
 	document.Find("div.puppeteer_test_answer_content").Each(func(i int, s *goquery.Selection) {
 		parent := s.Parent()
-		if parent.Find("div.spacing_log_originally_answered_banner").Length() == 0 {
+		otherAnswer := parent.Find("div.spacing_log_originally_answered_banner").Length()
+		relativeDivAnswer := parent.Find("div.puppeteer_test_question_title").Length()
+		relativeSpanAnswer := parent.Find("span.puppeteer_test_question_title").Length()
+		log.Printf("quora other answer otherAnswer: %d, relativeDivAnswer: %d, relativeSpanAnswer: %d", otherAnswer, relativeDivAnswer, relativeSpanAnswer)
+		if otherAnswer == 0 && relativeDivAnswer == 0 && relativeSpanAnswer == 0 {
 			author := ""
 			prevNode := s.Prev()
 			if prevNode.Length() > 0 {
