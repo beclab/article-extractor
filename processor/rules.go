@@ -198,6 +198,7 @@ var mediaTemplatePredefinedRules = map[string]string{
 	"pinterest.com":    "PinterestMediaContent",
 	"acfun.cn":         "ACFunMediaContent",
 	"reddit.com":       "RedditMediaContent",
+	"lizhi.fm":         "LizhiMediaContent",
 }
 
 var metadataTemplatePredefinedRules = map[string]string{
@@ -230,7 +231,7 @@ var metadataTemplatePredefinedRules = map[string]string{
 	"businessinsider.com": "BusinessinsiderScrapMetaData",
 	"foxbusiness.com":     "FoxbusinessScrapMetaData",
 	"businesslive.co.za":  "BusinessliveScrapMetaData",
-	"edition.cnn.com":     "EditionCnnScrapMetaData",
+	//"edition.cnn.com":     "EditionCnnScrapMetaData",
 	"money.cnn.com":       "EditionCnnScrapMetaData",
 	"skysports.com":       "SkySportsScrapMetaData",
 	"www.bbc.com/sport":   "BBCSportsScrapMetaData",
