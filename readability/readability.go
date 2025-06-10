@@ -1935,6 +1935,12 @@ func (r *Readability) getArticleMetadata(jsonLd map[string]string) map[string]st
 		metadataTitle = r.getArticleTitle()
 	}
 
+	if r.documentURI.Host == "nymag.com" {
+		title, exists := values["og:title"]
+		if exists && title != "" {
+			metadataTitle = title
+		}
+	}
 	// get author
 	metadataByline := strOr(
 		jsonLd["byline"],

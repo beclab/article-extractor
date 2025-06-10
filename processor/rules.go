@@ -178,6 +178,11 @@ var contentTemplatePredefinedRules = map[string]string{
 	"feishu.cn":                    "FeishuScrapContent",
 	"reddit.com":                   "RedditScrapContent",
 	"quora.com":                    "QuoraScrapContent",
+	"ximalaya.com":                 "XimalayaScrapContent",
+	"jianshu.com":                  "JianshuScrapContent",
+	"douban.com":                   "DoubanScrapContent",
+	"fandom.com":                   "FandomScrapContent",
+	"v2ex.com":                     "V2exScrapContent",
 	//"screencrush.com":              "ScreencrushScrapContent",
 	/*"espn.com": "EspnScrapContent",
 	"nbcsports.com":      "NBCSportsScrapContent",
@@ -198,6 +203,8 @@ var mediaTemplatePredefinedRules = map[string]string{
 	"pinterest.com":    "PinterestMediaContent",
 	"acfun.cn":         "ACFunMediaContent",
 	"reddit.com":       "RedditMediaContent",
+	"lizhi.fm":         "LizhiMediaContent",
+	"ximalaya.com":     "XimalayaMediaContent",
 }
 
 var metadataTemplatePredefinedRules = map[string]string{
@@ -230,7 +237,7 @@ var metadataTemplatePredefinedRules = map[string]string{
 	"businessinsider.com": "BusinessinsiderScrapMetaData",
 	"foxbusiness.com":     "FoxbusinessScrapMetaData",
 	"businesslive.co.za":  "BusinessliveScrapMetaData",
-	"edition.cnn.com":     "EditionCnnScrapMetaData",
+	//"edition.cnn.com":     "EditionCnnScrapMetaData",
 	"money.cnn.com":       "EditionCnnScrapMetaData",
 	"skysports.com":       "SkySportsScrapMetaData",
 	"www.bbc.com/sport":   "BBCSportsScrapMetaData",
@@ -252,6 +259,10 @@ var metadataTemplatePredefinedRules = map[string]string{
 	"acfun.cn":            "ACFunScrapMetaData",
 	"zhihu.com":           "ZhihuScrapMetaData",
 	"reddit.com":          "RedditScrapMetaData",
+	"ximalaya.com":        "XimalayaScrapMetaData",
+	"jianshu":             "JianshuScrapMetaData",
+	"douban.com":          "DoubanScrapMetaData",
+	"v2ex.com":            "V2exScrapMetaData",
 }
 
 var publishedAtTimeStampTemplatePredefinedRules = map[string]string{
@@ -302,6 +313,7 @@ var publishedAtTimeStampTemplatePredefinedRules = map[string]string{
 	"interestingengineering.com": "InterestingengineeringPublishedAtTimeFromScriptMetadata",
 	"acfun.cn":                   "ACFunPublishedAtTimeFromScriptMetadata",
 	"reddit.com":                 "RedditPublishedAtTimeFromScriptMetadata",
+	"douban.com":                 "DoubanPublishedAtTimeFromScriptMetadata",
 }
 
 func getPredefinedPublishedAtTimestampTemplateRules(websiteURL string) (string, string) {

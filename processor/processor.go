@@ -152,7 +152,7 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 					templateTime = &ptime
 		}
 			}*/
-	} else if !strings.HasPrefix(feedUrl, "wechat") {
+	} else { //if !strings.Contains(entryUrl, "weixin.qq.com") { //else if !strings.HasPrefix(feedUrl, "wechat") {
 		author = templates.ScrapAuthorMetaData(doc)
 	}
 
@@ -172,11 +172,14 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 		res := f.Call([]reflect.Value{reflect.ValueOf(doc)})
 		publishedAtTimeStamp = res[0].Int()
 
-	} else if !strings.HasPrefix(feedUrl, "wechat") {
+	} else if !strings.Contains(entryUrl, "weixin.qq.com") { //else if !strings.HasPrefix(feedUrl, "wechat") {
 		publishedAtTimeStamp = templates.ScrapPublishedAtTimeMetaData(doc)
 	}
-	if strings.HasPrefix(feedUrl, "wechat") {
+	if strings.Contains(entryUrl, "weixin.qq.com") { //if strings.HasPrefix(feedUrl, "wechat") {
 		publishedAtTimeStamp = GetPublishedAtTimestampForWechat(rawContent, entryUrl)
+		if author == "" {
+			author = GetAuthorForWechat(doc)
+		}
 	}
 
 	rulesDomain := ""
@@ -204,9 +207,10 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 	}
 	if content != "" {
 		//readability.InsertToFile("before_add_dynamic_image.html", content)
-		content = rewrite.Rewriter(entryUrl, content, "add_dynamic_image")
-
-		if strings.Contains(entryDomain, "notion.site") || strings.Contains(entryDomain, "quora.com") {
+		if !strings.Contains(entryDomain, "douban.com") {
+			content = rewrite.Rewriter(entryUrl, content, "add_dynamic_image")
+		}
+		if strings.Contains(entryDomain, "fandom.com") || strings.Contains(entryDomain, "notion.site") || strings.Contains(entryDomain, "quora.com") {
 			//不进行santitize
 			if strings.Contains(entryDomain, "notion.site") {
 				article.Title = doc.Find("title").Text()
@@ -336,5 +340,26 @@ func GetPublishedAtTimestampForWechat(rawContent string, url string) int64 {
 		return publishedAtTimestamp
 	}
 	return publishedAtTimestamp
+
+}
+
+func GetAuthorForWechat(document *goquery.Document) string {
+	author := ""
+	document.Find("div#meta_content>span.rich_media_meta_text").Each(func(i int, s *goquery.Selection) {
+		content := s.Text()
+		content = strings.TrimSpace(content)
+		content = strings.ReplaceAll(content, "\n", "")
+		author = content
+	})
+	if author == "" {
+		document.Find("div#meta_content>span.rich_media_meta_nickname").Each(func(i int, s *goquery.Selection) {
+			content := s.Text()
+			content = strings.TrimSpace(content)
+			content = strings.ReplaceAll(content, "\n", "")
+			author = content
+		})
+	}
+
+	return author
 
 }
