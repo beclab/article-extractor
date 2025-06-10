@@ -207,9 +207,10 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 	}
 	if content != "" {
 		//readability.InsertToFile("before_add_dynamic_image.html", content)
-		content = rewrite.Rewriter(entryUrl, content, "add_dynamic_image")
-
-		if strings.Contains(entryDomain, "notion.site") || strings.Contains(entryDomain, "quora.com") {
+		if !strings.Contains(entryDomain, "douban.com") {
+			content = rewrite.Rewriter(entryUrl, content, "add_dynamic_image")
+		}
+		if strings.Contains(entryDomain, "fandom.com") || strings.Contains(entryDomain, "notion.site") || strings.Contains(entryDomain, "quora.com") {
 			//不进行santitize
 			if strings.Contains(entryDomain, "notion.site") {
 				article.Title = doc.Find("title").Text()
