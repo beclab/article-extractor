@@ -21,7 +21,7 @@ func (t *Template) VimeoScrapContent(document *goquery.Document) string {
 		}
 		if description, ok := metaData[0]["description"]; ok {
 			str := description.(string)
-			log.Panicf("vimeo description %s", str)
+			log.Printf("vimeo description %s", str)
 			//STANHOPE AI  See full project here: https://www.behance.net/gallery/144244509/Stanhope-AI  Design
 			parts := strings.Split(str, "  ")
 			for _, part := range parts {
