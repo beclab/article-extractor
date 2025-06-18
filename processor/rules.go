@@ -183,6 +183,7 @@ var contentTemplatePredefinedRules = map[string]string{
 	"douban.com":                   "DoubanScrapContent",
 	"fandom.com":                   "FandomScrapContent",
 	"v2ex.com":                     "V2exScrapContent",
+	"okjike.com":                   "OKjikeScrapContent",
 	//"screencrush.com":              "ScreencrushScrapContent",
 	/*"espn.com": "EspnScrapContent",
 	"nbcsports.com":      "NBCSportsScrapContent",
@@ -192,19 +193,22 @@ var contentTemplatePredefinedRules = map[string]string{
 }
 
 var mediaTemplatePredefinedRules = map[string]string{
-	"storyfm.cn":       "StoryFMMediaContent",
-	"bilibili.com":     "BilibiliMediaContent",
-	"podbean.com":      "PodBeanMediaContent",
-	"xiaoyuzhoufm.com": "XiaoyuzhouFMMediaContent",
-	"youtube.com":      "YoutubeMediaContent",
-	"vimeo.com":        "VimeoMediaContent",
-	"rumble.com":       "RumbleMediaContent",
-	"spreaker.com":     "SpreakerMediaContent",
-	"pinterest.com":    "PinterestMediaContent",
-	"acfun.cn":         "ACFunMediaContent",
-	"reddit.com":       "RedditMediaContent",
-	"lizhi.fm":         "LizhiMediaContent",
-	"ximalaya.com":     "XimalayaMediaContent",
+	"storyfm.cn":         "StoryFMMediaContent",
+	"bilibili.com":       "BilibiliMediaContent",
+	"podbean.com":        "PodBeanMediaContent",
+	"xiaoyuzhoufm.com":   "XiaoyuzhouFMMediaContent",
+	"youtube.com":        "YoutubeMediaContent",
+	"vimeo.com":          "VimeoMediaContent",
+	"rumble.com":         "RumbleMediaContent",
+	"spreaker.com":       "SpreakerMediaContent",
+	"pinterest.com":      "PinterestMediaContent",
+	"acfun.cn":           "ACFunMediaContent",
+	"reddit.com":         "RedditMediaContent",
+	"lizhi.fm":           "LizhiMediaContent",
+	"ximalaya.com":       "XimalayaMediaContent",
+	"manybooks.net":      "ManyBooksMediaContent", //need cookies
+	"standardebooks.org": "StandardebooksMediaContent",
+	"z-library.gs":       "ZLibraryMediaContent", //need cookies
 }
 
 var metadataTemplatePredefinedRules = map[string]string{
@@ -263,6 +267,7 @@ var metadataTemplatePredefinedRules = map[string]string{
 	"jianshu":          "JianshuScrapMetaData",
 	"douban.com":       "DoubanScrapMetaData",
 	"v2ex.com":         "V2exScrapMetaData",
+	"okjike.com":       "OKjikeScrapMetaData",
 }
 
 var publishedAtTimeStampTemplatePredefinedRules = map[string]string{
@@ -314,6 +319,7 @@ var publishedAtTimeStampTemplatePredefinedRules = map[string]string{
 	"acfun.cn":                   "ACFunPublishedAtTimeFromScriptMetadata",
 	"reddit.com":                 "RedditPublishedAtTimeFromScriptMetadata",
 	"douban.com":                 "DoubanPublishedAtTimeFromScriptMetadata",
+	"okjike.com":                 "OKjikePublishedAtTimeFromScriptMetadata",
 }
 
 func getPredefinedPublishedAtTimestampTemplateRules(websiteURL string) (string, string) {

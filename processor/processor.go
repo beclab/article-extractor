@@ -210,7 +210,8 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 		if !strings.Contains(entryDomain, "douban.com") {
 			content = rewrite.Rewriter(entryUrl, content, "add_dynamic_image")
 		}
-		if strings.Contains(entryDomain, "vimeo.com") || strings.Contains(entryDomain, "fandom.com") ||
+		if strings.Contains(entryDomain, "okjike.com") || strings.Contains(entryDomain, "vimeo.com") ||
+			strings.Contains(entryDomain, "fandom.com") ||
 			strings.Contains(entryDomain, "notion.site") || strings.Contains(entryDomain, "quora.com") {
 			//不进行santitize
 			if strings.Contains(entryDomain, "notion.site") {
