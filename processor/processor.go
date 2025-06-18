@@ -111,7 +111,7 @@ func ExceptYTdlpDownloadQueryInArticle(rawContent, url string) string {
 		//mediaContent := res[0].String()
 		mediaUrl := res[1].String()
 		mediaType := res[2].String()
-		if mediaType == "audio" || mediaType == "ebook" || mediaType == "pef" {
+		if mediaType == "audio" || mediaType == "ebook" || mediaType == "pdf" {
 			return mediaUrl
 		}
 	}
