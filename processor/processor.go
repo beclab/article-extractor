@@ -100,7 +100,7 @@ func ArticleContentExtractor(rawContent, entryUrl, feedUrl, rules string) (strin
 	return content, pureContent
 }
 
-func RadioDetectionInArticle(rawContent, url string) string {
+func ExceptYTdlpDownloadQueryInArticle(rawContent, url string) string {
 	templateRawData := strings.NewReader(rawContent)
 	doc, _ := goquery.NewDocumentFromReader(templateRawData)
 	funcs := reflect.ValueOf(&templates.Template{})
@@ -111,7 +111,7 @@ func RadioDetectionInArticle(rawContent, url string) string {
 		//mediaContent := res[0].String()
 		mediaUrl := res[1].String()
 		mediaType := res[2].String()
-		if mediaType == "audio" {
+		if mediaType == "audio" || mediaType == "ebook" || mediaType == "pef" {
 			return mediaUrl
 		}
 	}
