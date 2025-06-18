@@ -100,7 +100,7 @@ func ArticleContentExtractor(rawContent, entryUrl, feedUrl, rules string) (strin
 	return content, pureContent
 }
 
-func ExceptYTdlpDownloadQueryInArticle(rawContent, url string) string {
+func ExceptYTdlpDownloadQueryInArticle(rawContent, url string) (string, string) {
 	templateRawData := strings.NewReader(rawContent)
 	doc, _ := goquery.NewDocumentFromReader(templateRawData)
 	funcs := reflect.ValueOf(&templates.Template{})
@@ -109,13 +109,13 @@ func ExceptYTdlpDownloadQueryInArticle(rawContent, url string) string {
 		f := funcs.MethodByName(mediaRule)
 		res := f.Call([]reflect.Value{reflect.ValueOf(url), reflect.ValueOf(doc)})
 		//mediaContent := res[0].String()
-		mediaUrl := res[1].String()
-		mediaType := res[2].String()
-		if mediaType == "audio" || mediaType == "ebook" || mediaType == "pdf" {
-			return mediaUrl
+		downloadUrl := res[1].String()
+		downloadType := res[2].String()
+		if downloadType == "audio" || downloadType == "ebook" || downloadType == "pdf" {
+			return downloadUrl, downloadType
 		}
 	}
-	return ""
+	return "", ""
 }
 func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, isrecommend bool) (string, string, *time.Time, string, string, string, int64, string, string, string) {
 	var publishedAtTimeStamp int64 = 0
