@@ -25,7 +25,7 @@ func isEpubURL(rawURL string) bool {
 
 func (t *Template) StandardebooksMediaContent(url string, document *goquery.Document) (string, string, string) {
 	if isEpubURL(url) {
-		return url, url, "ebook"
+		return url + "?source=download", url + "?source=download", "ebook"
 	}
 	downloadUrl := ""
 	document.Find("a.pub").Each(func(i int, s *goquery.Selection) {
@@ -35,5 +35,5 @@ func (t *Template) StandardebooksMediaContent(url string, document *goquery.Docu
 			return
 		}
 	})
-	return downloadUrl, downloadUrl, "ebook"
+	return downloadUrl + "?source=download", downloadUrl + "?source=download", "ebook"
 }
