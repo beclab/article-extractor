@@ -122,5 +122,21 @@ func (t *Template) ApnNewsScrapMetaData(document *goquery.Document) (string, str
 		}
 	})
 
+	if author == "" {
+		document.Find("meta[name='gtm-dataLayer']").Each(func(i int, s *goquery.Selection) {
+			gtmContent, exists := s.Attr("content")
+			if exists {
+				var metaData map[string]interface{}
+				unmarshalErr := json.Unmarshal([]byte(gtmContent), &metaData)
+				if unmarshalErr != nil {
+					log.Printf("convert  unmarshalError %v", unmarshalErr)
+				}
+				if authorData, ok := metaData["author"]; ok {
+					author = authorData.(string)
+				}
+			}
+		})
+	}
+
 	return author, published_at
 }
