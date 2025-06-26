@@ -268,6 +268,7 @@ var metadataTemplatePredefinedRules = map[string]string{
 	"douban.com":       "DoubanScrapMetaData",
 	"v2ex.com":         "V2exScrapMetaData",
 	"okjike.com":       "OKjikeScrapMetaData",
+	"xiaoyuzhoufm.com": "XiaoyuzhouScrapMetaData",
 }
 
 var publishedAtTimeStampTemplatePredefinedRules = map[string]string{
