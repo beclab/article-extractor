@@ -193,22 +193,27 @@ var contentTemplatePredefinedRules = map[string]string{
 }
 
 var mediaTemplatePredefinedRules = map[string]string{
-	"storyfm.cn":         "StoryFMMediaContent",
-	"bilibili.com":       "BilibiliMediaContent",
-	"podbean.com":        "PodBeanMediaContent",
-	"xiaoyuzhoufm.com":   "XiaoyuzhouFMMediaContent",
-	"youtube.com":        "YoutubeMediaContent",
-	"vimeo.com":          "VimeoMediaContent",
-	"rumble.com":         "RumbleMediaContent",
-	"spreaker.com":       "SpreakerMediaContent",
-	"pinterest.com":      "PinterestMediaContent",
-	"acfun.cn":           "ACFunMediaContent",
-	"reddit.com":         "RedditMediaContent",
-	"lizhi.fm":           "LizhiMediaContent",
-	"ximalaya.com":       "XimalayaMediaContent",
-	"manybooks.net":      "ManyBooksMediaContent", //need cookies
-	"standardebooks.org": "StandardebooksMediaContent",
-	"z-library.gs":       "ZLibraryMediaContent", //need cookies
+	"storyfm.cn":       "StoryFMMediaContent",
+	"bilibili.com":     "BilibiliMediaContent",
+	"podbean.com":      "PodBeanMediaContent",
+	"xiaoyuzhoufm.com": "XiaoyuzhouFMMediaContent",
+	"youtube.com":      "YoutubeMediaContent",
+	"vimeo.com":        "VimeoMediaContent",
+	"rumble.com":       "RumbleMediaContent",
+	"spreaker.com":     "SpreakerMediaContent",
+	"pinterest.com":    "PinterestMediaContent",
+	"acfun.cn":         "ACFunMediaContent",
+	"reddit.com":       "RedditMediaContent",
+	"lizhi.fm":         "LizhiMediaContent",
+	"ximalaya.com":     "XimalayaMediaContent",
+	//"manybooks.net":      "ManyBooksMediaContent", //need cookies
+	//"standardebooks.org": "StandardebooksMediaContent",
+	//"z-library.gs":       "ZLibraryMediaContent", //need cookies
+}
+var nonRawContentDownloadTemplatedRules = map[string]string{
+	"manybooks.net":      "ManyBooksNonMediaContent", //need cookies
+	"standardebooks.org": "StandardebooksNonMediaContent",
+	"z-library.gs":       "ZLibraryNonMediaContent", //need cookies
 }
 
 var metadataTemplatePredefinedRules = map[string]string{
@@ -352,6 +357,16 @@ func getPredefinedMediaScraperRules(websiteURL string) (string, string) {
 	urlDomain := domain(websiteURL)
 
 	for domain, rules := range mediaTemplatePredefinedRules {
+		if strings.Contains(urlDomain, domain) {
+			return domain, rules
+		}
+	}
+	return "", ""
+}
+
+func getNonRawContentDownloadScraperRules(websiteURL string) (string, string) {
+	urlDomain := domain(websiteURL)
+	for domain, rules := range nonRawContentDownloadTemplatedRules {
 		if strings.Contains(urlDomain, domain) {
 			return domain, rules
 		}

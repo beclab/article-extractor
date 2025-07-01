@@ -12,6 +12,12 @@ import (
 
 type Template struct{}
 
+type ExtractorFileInfo struct {
+	DownloadURL string
+	FileName    string
+	FileType    string
+}
+
 func ScrapContentUseRules(document *goquery.Document, rules string) (string, error) {
 	contents := ""
 	document.Find(rules).Each(func(i int, s *goquery.Selection) {
@@ -92,6 +98,14 @@ func ScrapAuthorMetaData(doc *goquery.Document) string {
 			author = strings.Join(authors, " & ")
 		}
 	}
+	if author == "" {
+		//https://forum.olares.cn/t/topic/73
+		doc.Find("span[itemprop='author']").Each(func(i int, s *goquery.Selection) {
+			author = strings.TrimSpace(s.Text())
+		})
+
+	}
+
 	return author
 }
 
