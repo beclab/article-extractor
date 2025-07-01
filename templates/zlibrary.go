@@ -3,17 +3,27 @@ package templates
 import (
 	"fmt"
 	"regexp"
-
-	"github.com/PuerkitoBio/goquery"
 )
 
-func (t *Template) ZLibraryMediaContent(url string, document *goquery.Document) (string, string, string) {
+func extractZLibraryIDWithRegex(urlStr string) string {
+	re := regexp.MustCompile(`/dl/(\d+)/`)
+	matches := re.FindStringSubmatch(urlStr)
+
+	if len(matches) < 2 {
+		return ""
+	}
+
+	return matches[1]
+}
+
+/*func (t *Template) ZLibraryDownloadFromWeb(url string, document *goquery.Document) []model.ExtractorFileInfo {
 	downloadUrl := ""
+	var fileList []model.ExtractorFileInfo
 	pattern := `^https:\/\/z-library\.gs\/book\/.*`
 	matched, err := regexp.MatchString(pattern, url)
 	if err != nil {
 		fmt.Println("zlib match err:", err)
-		return "", "", ""
+		return fileList
 	}
 	if matched {
 		document.Find("a.addDownloadedBook").Each(func(i int, s *goquery.Selection) {
@@ -25,16 +35,23 @@ func (t *Template) ZLibraryMediaContent(url string, document *goquery.Document) 
 		})
 	}
 	if downloadUrl != "" {
-		return downloadUrl, downloadUrl, "ebook"
+		fileList = append(fileList, model.ExtractorFileInfo{DownloadUrl: downloadUrl, FileName: extractZLibraryIDWithRegex(downloadUrl) + ".epub", FileType: "ebook"})
+		return fileList
 	}
-	pattern = `^https:\/\/z-library\.gs\/dl\/.*`
-	matched, err = regexp.MatchString(pattern, url)
+
+	return fileList
+
+}*/
+
+func (t *Template) ZLibraryNonMediaContent(url string) (string, string, string) {
+	pattern := `^https:\/\/z-library\.gs\/dl\/.*`
+	matched, err := regexp.MatchString(pattern, url)
 	if err != nil {
 		fmt.Println("zlib match err2:", err)
 		return "", "", ""
 	}
 	if matched {
-		return url, url, "ebook"
+		return url, extractZLibraryIDWithRegex(url) + ".epub", "ebook"
 	}
 
 	return "", "", ""

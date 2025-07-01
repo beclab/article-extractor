@@ -100,6 +100,22 @@ func ArticleContentExtractor(rawContent, entryUrl, feedUrl, rules string) (strin
 	return content, pureContent
 }
 
+func NonRawContentDownloadQueryInArticle(url string) (string, string) {
+	funcs := reflect.ValueOf(&templates.Template{})
+	_, mediaRule := getNonRawContentDOwnloadScraperRules(url)
+	if mediaRule != "" {
+		f := funcs.MethodByName(mediaRule)
+		res := f.Call([]reflect.Value{reflect.ValueOf(url)})
+		//mediaContent := res[0].String()
+		downloadUrl := res[1].String()
+		downloadType := res[2].String()
+		if downloadType == "audio" || downloadType == "ebook" || downloadType == "pdf" {
+			return downloadUrl, downloadType
+		}
+	}
+	return "", ""
+}
+
 func ExceptYTdlpDownloadQueryInArticle(rawContent, url string) (string, string) {
 	templateRawData := strings.NewReader(rawContent)
 	doc, _ := goquery.NewDocumentFromReader(templateRawData)

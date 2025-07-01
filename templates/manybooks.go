@@ -6,8 +6,6 @@ import (
 	"path"
 	"regexp"
 	"strings"
-
-	"github.com/PuerkitoBio/goquery"
 )
 
 func extractIDWithRegex(urlStr string) string {
@@ -21,7 +19,7 @@ func extractIDWithRegex(urlStr string) string {
 	return matches[1]
 }
 
-func (t *Template) ManyBooksMediaContent(urlStr string, document *goquery.Document) (string, string, string) {
+func (t *Template) ManyBooksNonMediaContent(urlStr string) (string, string, string) {
 	u, err := url.Parse(urlStr)
 	if err != nil {
 		fmt.Println("many books parse err:", err)
@@ -33,15 +31,14 @@ func (t *Template) ManyBooksMediaContent(urlStr string, document *goquery.Docume
 	if lastPart == "2" {
 		//ebook
 		id := extractIDWithRegex(urlStr)
-		downurl := "https://library.manybooks.net/live/get-book/" + id + "/epub"
-		return downurl, downurl, "ebook"
+		downloadUrl := "https://library.manybooks.net/live/get-book/" + id + "/epub"
+		return downloadUrl, id + ".epub", "ebook"
 	}
 	if lastPart == "6" {
 		//pdf
 		id := extractIDWithRegex(urlStr)
-		downurl := "https://library.manybooks.net/live/get-book/" + id + "/pdf"
-		return downurl, downurl, "pdf"
-
+		downloadUrl := "https://library.manybooks.net/live/get-book/" + id + "/pdf"
+		return downloadUrl, id + ".pdf", "pdf"
 	}
 
 	return "", "", ""
