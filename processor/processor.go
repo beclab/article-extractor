@@ -102,7 +102,7 @@ func ArticleContentExtractor(rawContent, entryUrl, feedUrl, rules string) (strin
 
 func NonRawContentDownloadQueryInArticle(url string) (string, string) {
 	funcs := reflect.ValueOf(&templates.Template{})
-	_, mediaRule := getNonRawContentDOwnloadScraperRules(url)
+	_, mediaRule := getNonRawContentDownloadScraperRules(url)
 	if mediaRule != "" {
 		f := funcs.MethodByName(mediaRule)
 		res := f.Call([]reflect.Value{reflect.ValueOf(url)})

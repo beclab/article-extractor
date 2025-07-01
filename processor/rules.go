@@ -364,7 +364,7 @@ func getPredefinedMediaScraperRules(websiteURL string) (string, string) {
 	return "", ""
 }
 
-func getNonRawContentDOwnloadScraperRules(websiteURL string) (string, string) {
+func getNonRawContentDownloadScraperRules(websiteURL string) (string, string) {
 	urlDomain := domain(websiteURL)
 	for domain, rules := range nonRawContentDownloadTemplatedRules {
 		if strings.Contains(urlDomain, domain) {
