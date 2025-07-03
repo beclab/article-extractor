@@ -100,7 +100,7 @@ func ArticleContentExtractor(rawContent, entryUrl, feedUrl, rules string) (strin
 	return content, pureContent
 }
 
-func NonRawContentDownloadQueryInArticle(url string) (string, string, string) {
+func NonMediaDownloadQueryInArticle(url string) (string, string, string) {
 	funcs := reflect.ValueOf(&templates.Template{})
 	_, mediaRule := getNonRawContentDownloadScraperRules(url)
 	if mediaRule != "" {
@@ -116,7 +116,7 @@ func NonRawContentDownloadQueryInArticle(url string) (string, string, string) {
 	return "", "", ""
 }
 
-func ExceptYTdlpDownloadQueryInArticle(rawContent, url string) (string, string) {
+func MediaDownloadQueryInArticle(rawContent, url string) (string, string) {
 	templateRawData := strings.NewReader(rawContent)
 	doc, _ := goquery.NewDocumentFromReader(templateRawData)
 	funcs := reflect.ValueOf(&templates.Template{})
