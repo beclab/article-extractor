@@ -184,6 +184,7 @@ var contentTemplatePredefinedRules = map[string]string{
 	"fandom.com":                   "FandomScrapContent",
 	"v2ex.com":                     "V2exScrapContent",
 	"okjike.com":                   "OKjikeScrapContent",
+	"xhslink.com":                  "XhsScrapContent",
 	//"screencrush.com":              "ScreencrushScrapContent",
 	/*"espn.com": "EspnScrapContent",
 	"nbcsports.com":      "NBCSportsScrapContent",
@@ -274,6 +275,7 @@ var metadataTemplatePredefinedRules = map[string]string{
 	"v2ex.com":         "V2exScrapMetaData",
 	"okjike.com":       "OKjikeScrapMetaData",
 	"xiaoyuzhoufm.com": "XiaoyuzhouScrapMetaData",
+	"xhslink.com":      "XhsScrapMetaData",
 }
 
 var publishedAtTimeStampTemplatePredefinedRules = map[string]string{
@@ -326,6 +328,7 @@ var publishedAtTimeStampTemplatePredefinedRules = map[string]string{
 	"reddit.com":                 "RedditPublishedAtTimeFromScriptMetadata",
 	"douban.com":                 "DoubanPublishedAtTimeFromScriptMetadata",
 	"okjike.com":                 "OKjikePublishedAtTimeFromScriptMetadata",
+	"xhslink.com":                "XhsPublishedAtTimeFromScriptMetadata",
 }
 
 func getPredefinedPublishedAtTimestampTemplateRules(websiteURL string) (string, string) {
