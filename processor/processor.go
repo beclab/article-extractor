@@ -26,7 +26,7 @@ func ArticleContentExtractor(rawContent, entryUrl, feedUrl, rules string) (strin
 	contentRule := getPredefinedRules(entryUrl, doc)
 	if contentRule != "" {
 		f := funcs.MethodByName(contentRule)
-		res := f.Call([]reflect.Value{reflect.ValueOf(doc)})
+		res := f.Call([]reflect.Value{reflect.ValueOf(entryUrl), reflect.ValueOf(doc)})
 		content = res[0].String()
 	}
 
@@ -97,7 +97,7 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 	contentRule := getPredefinedRules(entryUrl, doc)
 	if contentRule != "" {
 		f := funcs.MethodByName(contentRule)
-		res := f.Call([]reflect.Value{reflect.ValueOf(doc)})
+		res := f.Call([]reflect.Value{reflect.ValueOf(entryUrl), reflect.ValueOf(doc)})
 		content = res[0].String()
 		author = res[1].String()
 		publishedAt = res[2].Int()
