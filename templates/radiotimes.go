@@ -6,15 +6,13 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (t *Template) RadiotimesScrapContent(document *goquery.Document) string {
+func radiotimesScrapContent(document *goquery.Document) string {
 	contents := ""
-
 	document.Find("div.ad-placement,div[data-feature=NextRead],div.ad-slot,div.newsletter-sign-up,div.rating").Each(func(i int, s *goquery.Selection) {
 		RemoveNodes(s)
 	})
 	document.Find("p,strong").Each(func(i int, s *goquery.Selection) {
 		text := s.Text()
-
 		if strings.HasPrefix(text, "Read more:") {
 			n := s.Next()
 			if n != nil && len(n.Children().Nodes) > 1 {
@@ -23,9 +21,7 @@ func (t *Template) RadiotimesScrapContent(document *goquery.Document) string {
 					RemoveNodes(n)
 				}
 			}
-
 			RemoveNodes(s)
-
 		}
 
 	})
@@ -35,4 +31,9 @@ func (t *Template) RadiotimesScrapContent(document *goquery.Document) string {
 		contents += content
 	})
 	return contents
+}
+
+func (t *Template) RadiotimesExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
+	content := radiotimesScrapContent(document)
+	return content, "", 0, "", "", ""
 }

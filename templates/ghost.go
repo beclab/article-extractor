@@ -4,7 +4,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (t *Template) GhostScrapContent(document *goquery.Document) string {
+func ghostScrapContent(document *goquery.Document) string {
 	contents := ""
 
 	document.Find("div[class^='subscription-widget'],p.button-wrapper").Each(func(i int, s *goquery.Selection) {
@@ -17,4 +17,10 @@ func (t *Template) GhostScrapContent(document *goquery.Document) string {
 		contents += content
 	})
 	return contents
+}
+
+func (t *Template) GhostExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
+	content := ghostScrapContent(document)
+
+	return content, "", 0, "", "", ""
 }

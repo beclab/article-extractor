@@ -4,7 +4,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (t *Template) MicrosoftScrapContent(document *goquery.Document) string {
+func microsoftScrapContent(document *goquery.Document) string {
 	contents := ""
 
 	document.Find("header").Each(func(i int, s *goquery.Selection) {
@@ -17,4 +17,9 @@ func (t *Template) MicrosoftScrapContent(document *goquery.Document) string {
 		contents += content
 	})
 	return contents
+}
+
+func (t *Template) MicrosoftExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
+	content := microsoftScrapContent(document)
+	return content, "", 0, "", "", ""
 }

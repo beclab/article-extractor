@@ -4,14 +4,11 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (t *Template) FuturismScrapContent(document *goquery.Document) string {
+func futurismScrapContent(document *goquery.Document) string {
 	contents := ""
-
 	document.Find("div.ad__align,aside,img[aria-hidden=true]").Each(func(i int, s *goquery.Selection) {
 		RemoveNodes(s)
-
 	})
-
 	document.Find("article>header").Each(func(i int, s *goquery.Selection) {
 		var content string
 		next := s.Next()
@@ -26,4 +23,10 @@ func (t *Template) FuturismScrapContent(document *goquery.Document) string {
 		contents += content
 	})
 	return contents
+}
+
+func (t *Template) FuturismExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
+	content := futurismScrapContent(document)
+
+	return content, "", 0, "", "", ""
 }

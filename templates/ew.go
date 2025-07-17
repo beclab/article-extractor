@@ -6,7 +6,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (t *Template) EWScrapContent(document *goquery.Document) string {
+func ewScrapContent(document *goquery.Document) string {
 
 	contents := ""
 	document.Find("div.article__primary-video-container").Each(func(i int, s *goquery.Selection) {
@@ -27,4 +27,10 @@ func (t *Template) EWScrapContent(document *goquery.Document) string {
 		contents += content
 	})
 	return contents
+}
+
+func (t *Template) EWExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
+	content := ewScrapContent(document)
+
+	return content, "", 0, "", "", ""
 }

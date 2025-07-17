@@ -8,7 +8,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (t *Template) NewatlasScrapContent(document *goquery.Document) string {
+func newatlasScrapContent(document *goquery.Document) string {
 	contents := ""
 
 	document.Find("div.FullscreenCarousel-cover,div.ArticlePage-articleContainer").Each(func(i int, s *goquery.Selection) {
@@ -27,10 +27,8 @@ type NewatlasMetaData struct {
 	} `json:"@graph"`
 }
 
-func (t *Template) NewatlasScrapMetaData(doc *goquery.Document) (string, string) {
-	published_at := ""
+func newatlasScrapAuthor(doc *goquery.Document) string {
 	author := ""
-
 	scriptSelector := "script[type=\"application/ld+json\"]"
 	doc.Find(scriptSelector).Each(func(i int, s *goquery.Selection) {
 		scriptContent := strings.TrimSpace(s.Text())
@@ -44,11 +42,14 @@ func (t *Template) NewatlasScrapMetaData(doc *goquery.Document) (string, string)
 					author = graphData.Name
 					return
 				}
-
 			}
 		}
-
 	})
+	return author
+}
 
-	return author, published_at
+func (t *Template) NewatlasExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
+	content := newatlasScrapContent(document)
+	author := newatlasScrapAuthor(document)
+	return content, author, 0, "", "", ""
 }

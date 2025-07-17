@@ -6,7 +6,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (t *Template) QuoraScrapContent(document *goquery.Document) string {
+func quoraScrapContent(document *goquery.Document) string {
 	contents := ""
 	document.Find("div.spacing_log_question_page_ad").Each(func(i int, s *goquery.Selection) {
 		RemoveNodes(s)
@@ -28,7 +28,6 @@ func (t *Template) QuoraScrapContent(document *goquery.Document) string {
 						author = authorContent
 						return
 					}
-
 				})
 			}
 
@@ -57,4 +56,9 @@ func (t *Template) QuoraScrapContent(document *goquery.Document) string {
 
 	})
 	return contents
+}
+
+func (t *Template) QuoraExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
+	content := quoraScrapContent(document)
+	return content, "", 0, "", "", ""
 }

@@ -6,7 +6,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (t *Template) SpreakerScrapContent(document *goquery.Document) string {
+func spreakerScrapContent(document *goquery.Document) string {
 	contents := ""
 
 	document.Find("div[x-show=collapsed]").Each(func(i int, s *goquery.Selection) {
@@ -20,7 +20,8 @@ func (t *Template) SpreakerScrapContent(document *goquery.Document) string {
 	return contents
 }
 
-func (t *Template) SpreakerMediaContent(url string, document *goquery.Document) (string, string, string) {
+func (t *Template) SpreakerExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
+	content := spreakerScrapContent(document)
 	audioUrl := ""
 	document.Find("meta[name='twitter:player']").Each(func(i int, s *goquery.Selection) {
 		content, _ := s.Attr("content")
@@ -32,6 +33,5 @@ func (t *Template) SpreakerMediaContent(url string, document *goquery.Document) 
 			audioUrl = "https://api.spreaker.com/v2/episodes/" + episodeID + "/ondemand.mp3"
 		}
 	})
-
-	return audioUrl, audioUrl, "audio"
+	return content, "", 0, audioUrl, audioUrl, "audio"
 }

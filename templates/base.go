@@ -18,23 +18,8 @@ type ExtractorFileInfo struct {
 	FileType    string
 }
 
-func ScrapContentUseRules(document *goquery.Document, rules string) (string, error) {
-	contents := ""
-	document.Find(rules).Each(func(i int, s *goquery.Selection) {
-		var content string
-
-		content, _ = goquery.OuterHtml(s)
-		contents += content
-	})
-
-	return contents, nil
-}
-
 func GetArticleByDivClass(document *goquery.Document) string {
 	content := ""
-	/*cnn  article__content
-	  fortune.com articleContent
-	*/
 	document.Find("div.entry-content,div.content-entry,div.article-detail,div.entry,div.entry__content,div.article__content,div.articleContent").Each(func(i int, s *goquery.Selection) {
 		text := s.Text()
 		len := usefulContentLen(text)
@@ -103,7 +88,6 @@ func ScrapAuthorMetaData(doc *goquery.Document) string {
 		doc.Find("span[itemprop='author']").Each(func(i int, s *goquery.Selection) {
 			author = strings.TrimSpace(s.Text())
 		})
-
 	}
 
 	return author

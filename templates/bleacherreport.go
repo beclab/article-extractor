@@ -6,7 +6,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (t *Template) BleadherReportScrapContent(document *goquery.Document) string {
+func bleadherReportScrapContent(document *goquery.Document) string {
 	contents := ""
 	document.Find("div.twitterEmbed").Each(func(i int, s *goquery.Selection) {
 		RemoveNodes(s)
@@ -21,14 +21,16 @@ func (t *Template) BleadherReportScrapContent(document *goquery.Document) string
 				replaceVal := rxPicture.ReplaceAllString(src, "resize=650:")
 				firstChild.SetAttr("srcset", replaceVal)
 			}
-
 		}
 	})
-
 	document.Find("div.contentStream").Each(func(i int, s *goquery.Selection) {
 		var content string
 		content, _ = goquery.OuterHtml(s)
 		contents += content
 	})
 	return contents
+}
+func (t *Template) BleadherReportExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
+	content := bleadherReportScrapContent(document)
+	return content, "", 0, "", "", ""
 }

@@ -4,7 +4,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (t *Template) IndependentUKScrapContent(document *goquery.Document) string {
+func independentUKScrapContent(document *goquery.Document) string {
 
 	contents := ""
 	document.Find("aside,div.newsletter-component,nav.topics,div.show-comments,div.lightbox,div.iarFn,div.video-top-container,header#articleHeader>div:nth-child(1)>div:nth-child(3)>figure>figcaption").Each(func(i int, s *goquery.Selection) {
@@ -17,4 +17,9 @@ func (t *Template) IndependentUKScrapContent(document *goquery.Document) string 
 		contents += content
 	})
 	return contents
+}
+
+func (t *Template) IndependentUKExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
+	content := independentUKScrapContent(document)
+	return content, "", 0, "", "", ""
 }

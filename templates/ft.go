@@ -4,7 +4,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (t *Template) FTScrapContent(document *goquery.Document) string {
+func ftScrapContent(document *goquery.Document) string {
 	contents := ""
 
 	document.Find("aside,div.o-ads").Each(func(i int, s *goquery.Selection) {
@@ -16,4 +16,10 @@ func (t *Template) FTScrapContent(document *goquery.Document) string {
 		contents += content
 	})
 	return contents
+}
+
+func (t *Template) FTExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
+	content := ftScrapContent(document)
+
+	return content, "", 0, "", "", ""
 }

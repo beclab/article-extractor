@@ -21,9 +21,8 @@ import (
 
 </div>
 */
-func (t *Template) AbcNewsScrapMetaData(document *goquery.Document) (string, string) {
+func abcNewsScrapAuthor(document *goquery.Document) string {
 	author := ""
-	published_at := ""
 	document.Find("[data-testid='prism-byline']").Each(func(i int, s *goquery.Selection) {
 		s.Find("div:nth-child(1)>div").Each(func(i int, firstDiv *goquery.Selection) {
 			firstDiv.Find("div").Each(func(subindex int, subDiv *goquery.Selection) {
@@ -32,20 +31,13 @@ func (t *Template) AbcNewsScrapMetaData(document *goquery.Document) (string, str
 						author = authSpan.Text()
 					})
 				}
-				/*if subindex == 1 {
-					subDiv.Find("div").Each(func(i int, timeDiv *goquery.Selection) {
-						published_at = timeDiv.Text()
-					})
-				}*/
 			})
 		})
-
 	})
-
-	return author, published_at
+	return author
 }
 
-func (t *Template) AbcNewsScrapContent(document *goquery.Document) string {
+func abcNewsScrapContent(document *goquery.Document) string {
 	contents := ""
 	document.Find("div[data-testid=prism-byline],div[data-testid=prism-headline]>h1,div[data-testid=prism-tags]").Each(func(i int, s *goquery.Selection) {
 		RemoveNodes(s)
@@ -55,7 +47,6 @@ func (t *Template) AbcNewsScrapContent(document *goquery.Document) string {
 		if s.Text() == "___" {
 			RemoveNodes(s)
 		}
-
 	})
 	document.Find("div.FITT_Article_main__body").Each(func(i int, s *goquery.Selection) {
 		var content string
@@ -63,4 +54,10 @@ func (t *Template) AbcNewsScrapContent(document *goquery.Document) string {
 		contents += content
 	})
 	return contents
+}
+
+func (t *Template) AbcNewsExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
+	content := abcNewsScrapContent(document)
+	author := abcNewsScrapAuthor(document)
+	return content, author, 0, "", "", ""
 }
