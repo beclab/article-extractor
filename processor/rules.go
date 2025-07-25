@@ -144,10 +144,10 @@ var contentTemplatePredefinedRules = map[string]string{
 	"zhihu.com":              "ZhihuExtractorMetaInfo",
 }
 
-var nonRawContentDownloadTemplatedRules = map[string]string{
-	"manybooks.net":      "ManyBooksNonRawContent", //need cookies
-	"standardebooks.org": "StandardebooksNonRawContent",
-	"z-library.gs":       "ZLibraryNonRawContent", //need cookies
+var DownloadTypeUrlTemplatedRules = map[string]string{
+	"manybooks.net":      "ManyBooksDownloadType", //need cookies
+	"standardebooks.org": "StandardebooksDownloadType",
+	"z-library.gs":       "ZLibraryDownloadType", //need cookies
 }
 
 func getPredefinedRules(websiteURL string, doc *goquery.Document) string {
@@ -177,9 +177,9 @@ func getContentPostExtractorTemplateRules(websiteURL string) string {
 	return ""
 }
 
-func getNonRawContentDownloadScraperRules(websiteURL string) (string, string) {
+func getDownloadTypeByUrlRules(websiteURL string) (string, string) {
 	urlDomain := domain(websiteURL)
-	for domain, rules := range nonRawContentDownloadTemplatedRules {
+	for domain, rules := range DownloadTypeUrlTemplatedRules {
 		if strings.Contains(urlDomain, domain) {
 			return domain, rules
 		}

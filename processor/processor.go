@@ -57,42 +57,27 @@ func ArticleContentExtractor(rawContent, entryUrl, feedUrl, rules string) (strin
 	return content, pureContent
 }
 
-func NonRawConntentDownloadQueryInArticle(url string) (string, string, string) {
+func DownloadTypeQueryByUrl(url string) (string, string, string) {
 	funcs := reflect.ValueOf(&templates.Template{})
-	_, mediaRule := getNonRawContentDownloadScraperRules(url)
+	_, mediaRule := getDownloadTypeByUrlRules(url)
 	if mediaRule != "" {
 		f := funcs.MethodByName(mediaRule)
 		res := f.Call([]reflect.Value{reflect.ValueOf(url)})
 		downloadUrl := res[0].String()
 		downloadFile := res[1].String()
 		downloadType := res[2].String()
-		if downloadType == "audio" || downloadType == "ebook" || downloadType == "pdf" {
-			return downloadUrl, downloadFile, downloadType
-		}
+		return downloadUrl, downloadFile, downloadType
 	}
 	return "", "", ""
 }
 
-func ArticleExtractor(rawContent, entryUrl, feedUrl, rules string, isrecommend bool) (string, string, *time.Time, string, string, string, int64, string, string, string) {
-	templateRawData := strings.NewReader(rawContent)
-	doc, _ := goquery.NewDocumentFromReader(templateRawData)
-
-	entryDomain := domain(entryUrl)
-	rawData := strings.NewReader(rawContent)
-	article, err := readability.FromReader(rawData, entryUrl)
-	log.Printf("get readability article %s", entryUrl)
-	if err != nil {
-		log.Printf(`article extractor error %q`, err)
-		return "", "", nil, "", "", "", 0, "", "", ""
-	}
-
+func MetaDataQueryByTemplate(entryUrl, rawContent string, doc *goquery.Document) (string, string, int64, string, string, string) {
 	var content string
 	var author string
 	var mediaContent string
-	var mediaUrl string
-	var mediaType string
+	var downloadUrl string
+	var downloadType string
 	var publishedAt int64 = 0
-
 	funcs := reflect.ValueOf(&templates.Template{})
 	contentRule := getPredefinedRules(entryUrl, doc)
 	if contentRule != "" {
@@ -102,8 +87,8 @@ func ArticleExtractor(rawContent, entryUrl, feedUrl, rules string, isrecommend b
 		author = res[1].String()
 		publishedAt = res[2].Int()
 		mediaContent = res[3].String()
-		mediaUrl = res[4].String()
-		mediaType = res[5].String()
+		downloadUrl = res[4].String()
+		downloadType = res[5].String()
 	}
 	if author == "" {
 		if strings.Contains(entryUrl, "weixin.qq.com") {
@@ -119,6 +104,23 @@ func ArticleExtractor(rawContent, entryUrl, feedUrl, rules string, isrecommend b
 			publishedAt = templates.ScrapPublishedAtTimeMetaData(doc)
 		}
 	}
+	return content, author, publishedAt, mediaContent, downloadUrl, downloadType
+}
+
+func ArticleExtractor(rawContent, entryUrl, feedUrl, rules string, isrecommend bool) (string, string, *time.Time, string, string, string, int64, string, string, string) {
+	templateRawData := strings.NewReader(rawContent)
+	doc, _ := goquery.NewDocumentFromReader(templateRawData)
+
+	entryDomain := domain(entryUrl)
+	rawData := strings.NewReader(rawContent)
+	article, err := readability.FromReader(rawData, entryUrl)
+	log.Printf("get readability article %s", entryUrl)
+	if err != nil {
+		log.Printf(`article extractor error %q`, err)
+		return "", "", nil, "", "", "", 0, "", "", ""
+	}
+
+	content, author, publishedAt, mediaContent, downloadUrl, downloadType := MetaDataQueryByTemplate(entryUrl, rawContent, doc)
 
 	if content != "" {
 		content = processContent(content, entryDomain, entryUrl)
@@ -142,7 +144,7 @@ func ArticleExtractor(rawContent, entryUrl, feedUrl, rules string, isrecommend b
 	if updateTitle != "" {
 		article.Title = updateTitle
 	}
-	return article.Content, pureContent, article.PublishedDate, article.Image, article.Title, author, publishedAt, mediaContent, mediaUrl, mediaType
+	return article.Content, pureContent, article.PublishedDate, article.Image, article.Title, author, publishedAt, mediaContent, downloadUrl, downloadType
 }
 
 func updateArticleTitle(entryDomain string, doc *goquery.Document) string {

@@ -41,7 +41,7 @@ func extractZLibraryIDWithRegex(urlStr string) string {
 	return fileList
 }*/
 
-func (t *Template) ZLibraryNonRawContent(url string) (string, string, string) {
+func (t *Template) ZLibraryDownloadType(url string) (string, string, string) {
 	pattern := `^https:\/\/z-library\.gs\/dl\/.*`
 	matched, err := regexp.MatchString(pattern, url)
 	if err != nil {

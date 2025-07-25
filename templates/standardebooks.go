@@ -29,7 +29,7 @@ func extractStandardebooksName(urlStr string) string {
 	return fileName
 }
 
-func (t *Template) StandardebooksNonRawContent(url string, document *goquery.Document) (string, string, string) {
+func (t *Template) StandardebooksDownloadType(url string, document *goquery.Document) (string, string, string) {
 	if isEpubURL(url) {
 		fileName := extractStandardebooksName(url)
 		url = url + "?source=download"

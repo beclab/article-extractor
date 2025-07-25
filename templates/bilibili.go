@@ -60,5 +60,4 @@ func (t *Template) BilibiliExtractorMetaInfo(url string, document *goquery.Docum
 		}
 	})*/
 	return content, "", 0, "", "", ""
-
 }
