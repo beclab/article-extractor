@@ -3,8 +3,6 @@ package processor
 import (
 	"log"
 	"reflect"
-	"regexp"
-	"strconv"
 	"strings"
 	"time"
 
@@ -92,14 +90,14 @@ func MetaDataQueryByTemplate(entryUrl, rawContent string, doc *goquery.Document)
 	}
 	if author == "" {
 		if strings.Contains(entryUrl, "weixin.qq.com") {
-			author = GetAuthorForWechat(doc)
+			author = templates.GetAuthorForWechat(doc)
 		} else {
 			author = templates.ScrapAuthorMetaData(doc)
 		}
 	}
 	if publishedAt == 0 {
 		if strings.Contains(entryUrl, "weixin.qq.com") {
-			publishedAt = GetPublishedAtTimestampForWechat(rawContent, entryUrl)
+			publishedAt = templates.GetPublishedAtTimestampForWechat(rawContent, entryUrl)
 		} else {
 			publishedAt = templates.ScrapPublishedAtTimeMetaData(doc)
 		}
@@ -194,40 +192,4 @@ func getPureContent(content string) string {
 		return pureText
 	}
 	return ""
-}
-
-func GetPublishedAtTimestampForWechat(rawContent string, url string) int64 {
-	var publishedAtTimestamp int64 = 0
-	re := regexp.MustCompile(`var oriCreateTime = '(\d+)';`)
-	match := re.FindStringSubmatch(rawContent)
-	if len(match) > 1 {
-		timestamp, err := strconv.ParseInt(match[1], 10, 64)
-		if err != nil {
-			log.Printf("can not parse timestamp [%s] for entry [%s]", match[1], url)
-			return publishedAtTimestamp
-		}
-		publishedAtTimestamp = timestamp
-	} else {
-		log.Printf("can not find timestamp for entry [%s]", url)
-		return publishedAtTimestamp
-	}
-	return publishedAtTimestamp
-}
-
-func GetAuthorForWechat(document *goquery.Document) string {
-	var author string
-	// Function to extract author from a given selector
-	extractAuthor := func(selector string) {
-		document.Find(selector).Each(func(i int, s *goquery.Selection) {
-			content := strings.TrimSpace(s.Text())
-			content = strings.ReplaceAll(content, "\n", "")
-			author = content
-		})
-	}
-	// Try to extract author from both selectors
-	extractAuthor("div#meta_content>span.rich_media_meta_text")
-	if author == "" {
-		extractAuthor("div#meta_content>span.rich_media_meta_nickname")
-	}
-	return author
 }
