@@ -6,7 +6,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (t PostExtractorTemplate) EspnPostExtractor(content, feedUrl string) string {
+func (t PostExtractorTemplate) EspnPostExtractor(content string) string {
 	templateData := strings.NewReader(content)
 
 	doc, _ := goquery.NewDocumentFromReader(templateData)

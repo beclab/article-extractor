@@ -14,7 +14,8 @@ import (
 	"github.com/beclab/article-extractor/templates/postExtractor"
 )
 
-func ArticleContentExtractor(rawContent, entryUrl, feedUrl, rules string) (string, string) {
+// 得到content内容，主要在推荐算法爬取页面后解析正文内容
+func ArticleContentExtractor(rawContent, entryUrl string) (string, string) {
 	entryDomain := domain(entryUrl)
 	templateRawData := strings.NewReader(rawContent)
 	doc, _ := goquery.NewDocumentFromReader(templateRawData)
@@ -45,7 +46,7 @@ func ArticleContentExtractor(rawContent, entryUrl, feedUrl, rules string) (strin
 	}
 	contentPreRule := getContentPostExtractorTemplateRules(entryUrl)
 	if content != "" && contentPreRule != "" {
-		postContent := applyPostExtraction(contentPreRule, content, feedUrl)
+		postContent := applyPostExtraction(contentPreRule, content)
 		if postContent != "" {
 			content = postContent
 		}
@@ -55,6 +56,8 @@ func ArticleContentExtractor(rawContent, entryUrl, feedUrl, rules string) (strin
 	return content, pureContent
 }
 
+// 根据url，不用正文内容获得下载信息
+// 对于ebook和pdf 通过url来解析，不需要爬取页面
 func DownloadTypeQueryByUrl(url string) (string, string, string) {
 	funcs := reflect.ValueOf(&templates.Template{})
 	_, mediaRule := getDownloadTypeByUrlRules(url)
@@ -69,6 +72,7 @@ func DownloadTypeQueryByUrl(url string) (string, string, string) {
 	return "", "", ""
 }
 
+// 根据模版表获得正文,作者，发布时间，以及下载信息
 func MetaDataQueryByTemplate(entryUrl, rawContent string, doc *goquery.Document) (string, string, int64, string, string, string) {
 	var content string
 	var author string
@@ -105,7 +109,9 @@ func MetaDataQueryByTemplate(entryUrl, rawContent string, doc *goquery.Document)
 	return content, author, publishedAt, mediaContent, downloadUrl, downloadType
 }
 
-func ArticleExtractor(rawContent, entryUrl, feedUrl, rules string, isrecommend bool) (string, string, *time.Time, string, string, string, int64, string, string, string) {
+// 输入url，rawcontent
+// 输出entry的metadata
+func ArticleExtractor(rawContent, entryUrl string) (string, string, *time.Time, string, string, string, int64, string, string, string) {
 	templateRawData := strings.NewReader(rawContent)
 	doc, _ := goquery.NewDocumentFromReader(templateRawData)
 
@@ -119,7 +125,6 @@ func ArticleExtractor(rawContent, entryUrl, feedUrl, rules string, isrecommend b
 	}
 
 	content, author, publishedAt, mediaContent, downloadUrl, downloadType := MetaDataQueryByTemplate(entryUrl, rawContent, doc)
-
 	if content != "" {
 		content = processContent(content, entryDomain, entryUrl)
 	} else {
@@ -131,7 +136,7 @@ func ArticleExtractor(rawContent, entryUrl, feedUrl, rules string, isrecommend b
 
 	contentPreRule := getContentPostExtractorTemplateRules(entryUrl)
 	if article.Content != "" && contentPreRule != "" {
-		postContent := applyPostExtraction(contentPreRule, article.Content, feedUrl)
+		postContent := applyPostExtraction(contentPreRule, article.Content)
 		if postContent != "" {
 			article.Content = postContent
 		}
@@ -156,10 +161,10 @@ func updateArticleTitle(entryDomain string, doc *goquery.Document) string {
 	}
 	return updateTitle
 }
-func applyPostExtraction(contentPreRule, articleContent, feedUrl string) string {
+func applyPostExtraction(contentPreRule, articleContent string) string {
 	postFuncs := reflect.ValueOf(&postExtractor.PostExtractorTemplate{})
 	f := postFuncs.MethodByName(contentPreRule)
-	res := f.Call([]reflect.Value{reflect.ValueOf(articleContent), reflect.ValueOf(feedUrl)})
+	res := f.Call([]reflect.Value{reflect.ValueOf(articleContent)})
 	return res[0].String()
 }
 
