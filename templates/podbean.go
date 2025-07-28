@@ -8,9 +8,8 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (t *Template) PodBeanScrapContent(document *goquery.Document) string {
+func podBeanScrapContent(document *goquery.Document) string {
 	contents := ""
-
 	document.Find("div.episode-detail-top,div.cc-post-toolbar").Each(func(i int, s *goquery.Selection) {
 		RemoveNodes(s)
 	})
@@ -22,8 +21,9 @@ func (t *Template) PodBeanScrapContent(document *goquery.Document) string {
 	return contents
 }
 
-func (t *Template) PodBeanMediaContent(url string, document *goquery.Document) (string, string, string) {
+func (t *Template) PodBeanExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
 	audioUrl := ""
+	content := podBeanScrapContent(document)
 	scriptSelector := "script[type=\"application/ld+json\"]"
 	document.Find(scriptSelector).Each(func(i int, s *goquery.Selection) {
 		scriptContent := strings.TrimSpace(s.Text())
@@ -41,7 +41,6 @@ func (t *Template) PodBeanMediaContent(url string, document *goquery.Document) (
 				}
 			}
 		}
-
 	})
-	return audioUrl, audioUrl, "audio"
+	return content, "", 0, audioUrl, audioUrl, "audio"
 }

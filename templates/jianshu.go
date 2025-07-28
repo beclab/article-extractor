@@ -8,7 +8,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (t *Template) JianshuScrapContent(document *goquery.Document) string {
+func jianshuScrapContent(document *goquery.Document) string {
 	contents := ""
 
 	document.Find("article").Each(func(i int, s *goquery.Selection) {
@@ -19,11 +19,9 @@ func (t *Template) JianshuScrapContent(document *goquery.Document) string {
 	return contents
 }
 
-func (t *Template) JianshuScrapMetaData(document *goquery.Document) (string, string) {
+func jianshuScrapAuthor(document *goquery.Document) string {
 
 	author := ""
-	published_at := ""
-
 	document.Find("script[type='application/json']").Each(func(i int, s *goquery.Selection) {
 		scriptContent := strings.TrimSpace(s.Text())
 		var metaData map[string]interface{}
@@ -45,5 +43,11 @@ func (t *Template) JianshuScrapMetaData(document *goquery.Document) (string, str
 			}
 		}
 	})
-	return author, published_at
+	return author
+}
+
+func (t *Template) JianshuExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
+	content := jianshuScrapContent(document)
+	author := jianshuScrapAuthor(document)
+	return content, author, 0, "", "", ""
 }

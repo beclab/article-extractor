@@ -4,7 +4,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (t *Template) UsmagazineScrapContent(document *goquery.Document) string {
+func usmagazineContentExtractor(document *goquery.Document) string {
 	contents := ""
 
 	document.Find("div#news-block,div.link-related,div.in-this-article").Each(func(i int, s *goquery.Selection) {
@@ -17,4 +17,9 @@ func (t *Template) UsmagazineScrapContent(document *goquery.Document) string {
 		contents += content
 	})
 	return contents
+}
+
+func (t *Template) UsmagazineExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
+	content := usmagazineContentExtractor(document)
+	return content, "", 0, "", "", ""
 }

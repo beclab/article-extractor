@@ -19,7 +19,7 @@ func extractIDWithRegex(urlStr string) string {
 	return matches[1]
 }
 
-func (t *Template) ManyBooksNonMediaContent(urlStr string) (string, string, string) {
+func (t *Template) ManyBooksDownloadType(urlStr string) (string, string, string) {
 	u, err := url.Parse(urlStr)
 	if err != nil {
 		fmt.Println("many books parse err:", err)

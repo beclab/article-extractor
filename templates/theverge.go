@@ -4,7 +4,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (t *Template) ThevergeScrapContent(document *goquery.Document) string {
+func thevergeScrapContent(document *goquery.Document) string {
 
 	contents := ""
 
@@ -17,4 +17,9 @@ func (t *Template) ThevergeScrapContent(document *goquery.Document) string {
 		contents += content
 	})
 	return contents
+}
+
+func (t *Template) ThevergeExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
+	content := thevergeScrapContent(document)
+	return content, "", 0, "", "", ""
 }

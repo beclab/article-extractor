@@ -4,7 +4,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (t *Template) MessengerScrapContent(document *goquery.Document) string {
+func messengerScrapContent(document *goquery.Document) string {
 	contents := ""
 	document.Find("div.border-grey-3,div.custom-twitter-embed").Each(func(i int, s *goquery.Selection) {
 		RemoveNodes(s)
@@ -26,4 +26,9 @@ func (t *Template) MessengerScrapContent(document *goquery.Document) string {
 		contents += content
 	})
 	return contents
+}
+
+func (t *Template) MessengerExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
+	content := messengerScrapContent(document)
+	return content, "", 0, "", "", ""
 }

@@ -38,12 +38,10 @@ func extractZLibraryIDWithRegex(urlStr string) string {
 		fileList = append(fileList, model.ExtractorFileInfo{DownloadUrl: downloadUrl, FileName: extractZLibraryIDWithRegex(downloadUrl) + ".epub", FileType: "ebook"})
 		return fileList
 	}
-
 	return fileList
-
 }*/
 
-func (t *Template) ZLibraryNonMediaContent(url string) (string, string, string) {
+func (t *Template) ZLibraryDownloadType(url string) (string, string, string) {
 	pattern := `^https:\/\/z-library\.gs\/dl\/.*`
 	matched, err := regexp.MatchString(pattern, url)
 	if err != nil {
@@ -53,7 +51,6 @@ func (t *Template) ZLibraryNonMediaContent(url string) (string, string, string) 
 	if matched {
 		return url, extractZLibraryIDWithRegex(url) + ".epub", "ebook"
 	}
-
 	return "", "", ""
 
 }

@@ -4,10 +4,8 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (t *Template) MattturckScrapContent(document *goquery.Document) string {
-
+func mattturckScrapContent(document *goquery.Document) string {
 	contents := ""
-
 	document.Find("aside").Each(func(i int, s *goquery.Selection) {
 		RemoveNodes(s)
 	})
@@ -17,4 +15,9 @@ func (t *Template) MattturckScrapContent(document *goquery.Document) string {
 		contents += content
 	})
 	return contents
+}
+
+func (t *Template) MattturckExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
+	content := mattturckScrapContent(document)
+	return content, "", 0, "", "", ""
 }

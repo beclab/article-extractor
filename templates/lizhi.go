@@ -8,7 +8,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (t *Template) LizhiMediaContent(url string, document *goquery.Document) (string, string, string) {
+func (t *Template) LizhiExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
 	audioUrl := ""
 	document.Find("script").Each(func(i int, s *goquery.Selection) {
 		scriptContent, err := s.Html()
@@ -24,6 +24,5 @@ func (t *Template) LizhiMediaContent(url string, document *goquery.Document) (st
 			}
 		}
 	})
-
-	return audioUrl, audioUrl, "audio"
+	return "", "", 0, audioUrl, audioUrl, "audio"
 }

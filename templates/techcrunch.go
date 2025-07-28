@@ -4,10 +4,8 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (t *Template) TechCrunchScrapContent(document *goquery.Document) string {
-
+func techCrunchScrapContent(document *goquery.Document) string {
 	contents := ""
-
 	document.Find("h1.article__title,div.article__byline").Each(func(i int, s *goquery.Selection) {
 		RemoveNodes(s)
 	})
@@ -17,4 +15,9 @@ func (t *Template) TechCrunchScrapContent(document *goquery.Document) string {
 		contents += content
 	})
 	return contents
+}
+
+func (t *Template) TechCrunchExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
+	content := techCrunchScrapContent(document)
+	return content, "", 0, "", "", ""
 }

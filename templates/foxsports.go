@@ -45,13 +45,11 @@ type FoxsportsMetaData struct {
 	} `json:"publisher"`
 }
 
-func (t *Template) FoxSportsScrapContent(document *goquery.Document) string {
-
+func foxSportsScrapContent(document *goquery.Document) string {
 	contents := ""
 	document.Find("h1.story-title,div.story-header-container,div.fwAdContainer,div.storyFavoriteContainer,div.story-social-group,div.story-topic-group,div.story-favorites-section-add").Each(func(i int, s *goquery.Selection) {
 		RemoveNodes(s)
 	})
-
 	document.Find("div.story-content-main").Each(func(i int, s *goquery.Selection) {
 		var content string
 		content, _ = goquery.OuterHtml(s)
@@ -60,21 +58,14 @@ func (t *Template) FoxSportsScrapContent(document *goquery.Document) string {
 	return contents
 }
 
-func (t *Template) FoxsportsScrapMetaData(document *goquery.Document) (string, string) {
+func foxSportsScrapAuthor(document *goquery.Document) string {
 
 	author := ""
-	published_at := ""
-	scriptSelectorFirst := "head > script[type=\"application/ld+json\"]"
-	scriptSelectorSecond := "body > script[type=\"application/ld+json\"]"
-	scriptSelectorThird := "script[type=\"application/ld+json\"]"
+	scriptSelector := "script[type=\"application/ld+json\"]"
 
 	scriptSelectorList := make([]string, 100)
-	scriptSelectorList = append(scriptSelectorList, scriptSelectorFirst)
-	scriptSelectorList = append(scriptSelectorList, scriptSelectorSecond)
-	scriptSelectorList = append(scriptSelectorList, scriptSelectorThird)
-	fmt.Println("11111111111111111111111")
+	scriptSelectorList = append(scriptSelectorList, scriptSelector)
 	for _, scriptSelector := range scriptSelectorList {
-
 		document.Find(scriptSelector).Each(func(i int, s *goquery.Selection) {
 			if author != "" {
 				return
@@ -97,42 +88,7 @@ func (t *Template) FoxsportsScrapMetaData(document *goquery.Document) (string, s
 		}
 	}
 	log.Printf("author last: %s", author)
-	return author, published_at
-}
-
-func (t *Template) FoxsportsPublishedAtTimeFromScriptMetadata(document *goquery.Document) int64 {
-
-	var publishedAt int64 = 0
-
-	scriptSelectorFirst := "head > script[type=\"application/ld+json\"]"
-	scriptSelectorSecond := "body > script[type=\"application/ld+json\"]"
-	scriptSelectorThird := "script[type=\"application/ld+json\"]"
-
-	scriptSelectorList := make([]string, 100)
-	scriptSelectorList = append(scriptSelectorList, scriptSelectorFirst)
-	scriptSelectorList = append(scriptSelectorList, scriptSelectorSecond)
-	scriptSelectorList = append(scriptSelectorList, scriptSelectorThird)
-
-	for _, scriptSelector := range scriptSelectorList {
-
-		document.Find(scriptSelector).Each(func(i int, s *goquery.Selection) {
-			if publishedAt != 0 {
-				return
-			}
-			scriptContent := strings.TrimSpace(s.Text())
-			var firstTypeMetaData FoxsportsMetaData
-			unmarshalErr := json.Unmarshal([]byte(scriptContent), &firstTypeMetaData)
-			if unmarshalErr != nil {
-				log.Printf("convert SkyNewsScrap unmarshalError %v", unmarshalErr)
-				return
-			}
-			fmt.Printf("------------------- %s", firstTypeMetaData.DatePublished)
-
-			//publishedAt = firstTypeMetaData[0].DatePublished.Unix()
-		})
-
-	}
-	return publishedAt
+	return author
 }
 
 func extractAuthorFoxSports(text string) (string, error) {
@@ -142,8 +98,14 @@ func extractAuthorFoxSports(text string) (string, error) {
 	}
 
 	match := re.FindStringSubmatch(text)
-	if match != nil && len(match) > 1 {
-		return match[1], nil // 返回捕获的作者名
+	if len(match) > 1 {
+		return match[1], nil
 	}
 	return "", fmt.Errorf("no match found")
+}
+
+func (t *Template) FoxSportsExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
+	content := foxSportsScrapContent(document)
+	author := foxSportsScrapAuthor(document)
+	return content, author, 0, "", "", ""
 }

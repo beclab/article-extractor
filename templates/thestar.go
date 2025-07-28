@@ -2,7 +2,7 @@ package templates
 
 import "github.com/PuerkitoBio/goquery"
 
-func (t *Template) TheStarScrapContent(document *goquery.Document) string {
+func theStarScrapContent(document *goquery.Document) string {
 	contents := ""
 	document.Find("div.hidden-print").Each(func(i int, s *goquery.Selection) {
 		RemoveNodes(s)
@@ -13,4 +13,9 @@ func (t *Template) TheStarScrapContent(document *goquery.Document) string {
 		contents += content
 	})
 	return contents
+}
+
+func (t *Template) TheStarExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
+	content := theStarScrapContent(document)
+	return content, "", 0, "", "", ""
 }

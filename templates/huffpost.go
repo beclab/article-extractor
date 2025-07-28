@@ -8,10 +8,9 @@ import (
 
 // site url  https://www.huffpost.com/news/world-news
 // rss  https://chaski.huffpost.com/us/auto/vertical/world-news
-func (t *Template) HuffPostScrapMetaData(document *goquery.Document) (string, string) {
+func huffPostScrapAuthor(document *goquery.Document) string {
 
 	author := ""
-	published_at := ""
 	cssSelectorFirst := "#entry-header > header > div.bottom-header.js-cet-subunit > div.bottom-header__left > div.entry__wirepartner.entry-wirepartner > span"
 	cssSelectorSecond := "#entry-footer > div.entry__author-cards > div > div > div > h2 > a > span"
 
@@ -28,10 +27,10 @@ func (t *Template) HuffPostScrapMetaData(document *goquery.Document) (string, st
 		}
 	}
 
-	return author, published_at
+	return author
 }
 
-func (t *Template) HuffPostScrapContent(document *goquery.Document) string {
+func huffPostScrapContent(document *goquery.Document) string {
 	contents := ""
 	document.Find("div.cli-advertisement,aside,div.loading-message,div#support-huffpost-entry").Each(func(i int, s *goquery.Selection) {
 		RemoveNodes(s)
@@ -43,4 +42,10 @@ func (t *Template) HuffPostScrapContent(document *goquery.Document) string {
 		contents += content
 	})
 	return contents
+}
+
+func (t *Template) HuffPostExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
+	content := huffPostScrapContent(document)
+	author := huffPostScrapAuthor(document)
+	return content, author, 0, "", "", ""
 }

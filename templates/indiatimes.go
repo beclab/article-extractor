@@ -6,7 +6,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (t *Template) IndiatimesScrapContent(document *goquery.Document) string {
+func indiatimesScrapContent(document *goquery.Document) string {
 	contents := ""
 
 	document.Find("header,div.outsideInd").Each(func(i int, s *goquery.Selection) {
@@ -24,4 +24,9 @@ func (t *Template) IndiatimesScrapContent(document *goquery.Document) string {
 		contents += content
 	})
 	return contents
+}
+
+func (t *Template) IndiatimesExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
+	content := indiatimesScrapContent(document)
+	return content, "", 0, "", "", ""
 }

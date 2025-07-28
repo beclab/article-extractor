@@ -240,7 +240,7 @@ func removeExtractText(document *goquery.Document) {
 
 }
 
-func (t PostExtractorTemplate) WechatPostExtractor(content, feedUrl string) string {
+func (t PostExtractorTemplate) WechatPostExtractor(content string) string {
 	//content = strings.ReplaceAll(content, "&nbsp;", "")
 	templateData := strings.NewReader(content)
 

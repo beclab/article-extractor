@@ -4,7 +4,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (t *Template) DeadspinScrapContent(document *goquery.Document) string {
+func deadspinScrapContent(document *goquery.Document) string {
 
 	contents := ""
 
@@ -14,4 +14,10 @@ func (t *Template) DeadspinScrapContent(document *goquery.Document) string {
 		contents += content
 	})
 	return contents
+}
+
+func (t *Template) DeadspinExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
+	content := deadspinScrapContent(document)
+
+	return content, "", 0, "", "", ""
 }

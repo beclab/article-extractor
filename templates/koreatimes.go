@@ -4,10 +4,6 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (t *Template) KoreatimesScrapMetaData(document *goquery.Document) (string, string) {
-
-	author := "KoreaTimes"
-	published_at := ""
-
-	return author, published_at
+func (t *Template) KoreatimesExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
+	return "", "KoreaTimes", 0, "", "", ""
 }

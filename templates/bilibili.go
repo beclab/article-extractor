@@ -8,9 +8,8 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (t *Template) BilibiliScrapContent(document *goquery.Document) string {
+func bilibiliScrapContent(document *goquery.Document) string {
 	contents := ""
-
 	document.Find("span.desc-info-text").Each(func(i int, s *goquery.Selection) {
 		var content string
 		content, _ = goquery.OuterHtml(s)
@@ -28,18 +27,17 @@ func (t *Template) BilibiliScrapContent(document *goquery.Document) string {
 	document.Find("meta[property='og:image']").Each(func(i int, s *goquery.Selection) {
 		if content, exists := s.Attr("content"); exists {
 			if strings.HasPrefix(content, "https:https://") {
-				// 去掉前面的 "https:"
 				content = strings.TrimPrefix(content, "https:")
 			}
 			add_img = fmt.Sprintf("<figure><img src=\"%s\"/></figure>", content)
 		}
 	})
-
 	return add_img + contents
 }
 
-func (t *Template) BilibiliMediaContent(url string, document *goquery.Document) (string, string, string) {
+func (t *Template) BilibiliExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
 	bvid := ""
+	content := bilibiliScrapContent(document)
 	document.Find("meta[itemprop=url]").Each(func(i int, s *goquery.Selection) {
 		if content, exists := s.Attr("content"); exists {
 			videoPattern := `video/(\w+)`
@@ -49,21 +47,17 @@ func (t *Template) BilibiliMediaContent(url string, document *goquery.Document) 
 				bvid = match[1]
 			}
 		}
-
 	})
-
 	if bvid != "" {
 		embeddingUrl := "https://www.bilibili.com/blackboard/html5mobileplayer.html?bvid=" + bvid + "&amp;high_quality=1&amp;autoplay=0"
 		contents := "<iframe width='910' height='668' src='" + embeddingUrl + "'  border='0' scrolling='no' border='0 frameborder='no' framespacing='0' allowfullscreen='true' referrerpolicy='no-referrer'></iframe>"
-		return contents, url, "video"
+		return content, "", 0, contents, url, "video"
 	}
-	downloadUrl := ""
-	downloadType := ""
-	document.Find("meta[property='og:url']").Each(func(i int, s *goquery.Selection) {
+	/*document.Find("meta[property='og:url']").Each(func(i int, s *goquery.Selection) {
 		if content, exists := s.Attr("content"); exists {
 			downloadUrl = content
 			downloadType = "video"
 		}
-	})
-	return "", downloadUrl, downloadType
+	})*/
+	return content, "", 0, "", "", ""
 }

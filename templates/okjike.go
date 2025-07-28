@@ -9,7 +9,7 @@ import (
 	"github.com/beclab/article-extractor/readability"
 )
 
-func (t *Template) OKjikeScrapContent(document *goquery.Document) string {
+func okjikeScrapContent(document *goquery.Document) string {
 	contents := ""
 	document.Find("div.info").Each(func(i int, s *goquery.Selection) {
 		RemoveNodes(s)
@@ -19,24 +19,11 @@ func (t *Template) OKjikeScrapContent(document *goquery.Document) string {
 		content, _ = goquery.OuterHtml(s)
 		contents += content
 	})
-
 	return contents
 }
 
-func (t *Template) OKjikeScrapMetaData(document *goquery.Document) (string, string) {
-	author := ""
-	published_at := ""
-
-	document.Find("div.title").Each(func(i int, s *goquery.Selection) {
-		author = s.Text()
-	})
-	return author, published_at
-}
-
-func (t *Template) OKjikePublishedAtTimeFromScriptMetadata(document *goquery.Document) int64 {
-
+func okjikeScrapPublishedAt(document *goquery.Document) int64 {
 	var publishedAt int64 = 0
-
 	scriptSelector := "script[type=\"application/json\"]"
 	document.Find(scriptSelector).Each(func(i int, s *goquery.Selection) {
 		scriptContent := strings.TrimSpace(s.Text())
@@ -57,8 +44,17 @@ func (t *Template) OKjikePublishedAtTimeFromScriptMetadata(document *goquery.Doc
 				}
 			}
 		}
-
 	})
 
 	return publishedAt
+}
+
+func (t *Template) OKjikeExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
+	content := okjikeScrapContent(document)
+	author := ""
+	document.Find("div.title").Each(func(i int, s *goquery.Selection) {
+		author = s.Text()
+	})
+	publishedAt := okjikeScrapPublishedAt(document)
+	return content, author, publishedAt, "", "", ""
 }

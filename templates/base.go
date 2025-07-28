@@ -3,8 +3,9 @@ package templates
 import (
 	"encoding/json"
 	"log"
+	"regexp"
+	"strconv"
 	"strings"
-	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/beclab/article-extractor/readability"
@@ -18,23 +19,8 @@ type ExtractorFileInfo struct {
 	FileType    string
 }
 
-func ScrapContentUseRules(document *goquery.Document, rules string) (string, error) {
-	contents := ""
-	document.Find(rules).Each(func(i int, s *goquery.Selection) {
-		var content string
-
-		content, _ = goquery.OuterHtml(s)
-		contents += content
-	})
-
-	return contents, nil
-}
-
 func GetArticleByDivClass(document *goquery.Document) string {
 	content := ""
-	/*cnn  article__content
-	  fortune.com articleContent
-	*/
 	document.Find("div.entry-content,div.content-entry,div.article-detail,div.entry,div.entry__content,div.article__content,div.articleContent").Each(func(i int, s *goquery.Selection) {
 		text := s.Text()
 		len := usefulContentLen(text)
@@ -103,7 +89,6 @@ func ScrapAuthorMetaData(doc *goquery.Document) string {
 		doc.Find("span[itemprop='author']").Each(func(i int, s *goquery.Selection) {
 			author = strings.TrimSpace(s.Text())
 		})
-
 	}
 
 	return author
@@ -139,20 +124,51 @@ func ScrapPublishedAtTimeMetaData(doc *goquery.Document) int64 {
 	})
 	return publishedAtTimestamp
 }
-func checkUnusedlDiv(s *goquery.Selection) bool {
-	is_remove := false
+
+func GetPublishedAtTimestampForWechat(rawContent string, url string) int64 {
+	var publishedAtTimestamp int64 = 0
+	re := regexp.MustCompile(`var oriCreateTime = '(\d+)';`)
+	match := re.FindStringSubmatch(rawContent)
+	if len(match) > 1 {
+		timestamp, err := strconv.ParseInt(match[1], 10, 64)
+		if err != nil {
+			log.Printf("can not parse timestamp [%s] for entry [%s]", match[1], url)
+			return publishedAtTimestamp
+		}
+		publishedAtTimestamp = timestamp
+	} else {
+		log.Printf("can not find timestamp for entry [%s]", url)
+		return publishedAtTimestamp
+	}
+	return publishedAtTimestamp
+}
+
+func GetAuthorForWechat(document *goquery.Document) string {
+	var author string
+	extractAuthor := func(selector string) {
+		document.Find(selector).Each(func(i int, s *goquery.Selection) {
+			content := strings.TrimSpace(s.Text())
+			content = strings.ReplaceAll(content, "\n", "")
+			author = content
+		})
+	}
+	extractAuthor("div#meta_content>span.rich_media_meta_text")
+	if author == "" {
+		extractAuthor("div#meta_content>span.rich_media_meta_nickname")
+	}
+	return author
+}
+
+func checkUnusedlDiv(s *goquery.Selection) {
 	node := s.Get(0)
 	d1 := node.Data
 	content := s.Text()
 	if strings.ToLower(strings.TrimSpace(content)) == "advertisement" {
 		RemoveNodes(s)
-		is_remove = true
 	}
 	if d1 == "ul" && len(content) == 0 {
 		RemoveNodes(s)
-		is_remove = true
 	}
-	return is_remove
 }
 
 func checkStrArrContains(arr []string, e string) bool {
@@ -178,13 +194,4 @@ func RemoveNodes(s *goquery.Selection) {
 			parent.Get(0).RemoveChild(s.Get(0))
 		}
 	})
-}
-
-func StringToTimestamp(timeStr string) (int64, error) {
-	t, err := time.Parse("2006/01/02 15:04:05", timeStr)
-	if err != nil {
-		return 0, err
-	}
-
-	return t.Unix(), nil
 }

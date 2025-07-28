@@ -3,8 +3,6 @@ package processor
 import (
 	"log"
 	"reflect"
-	"regexp"
-	"strconv"
 	"strings"
 	"time"
 
@@ -16,63 +14,24 @@ import (
 	"github.com/beclab/article-extractor/templates/postExtractor"
 )
 
-func getRulesFromContent(websiteURL string, doc *goquery.Document) string {
-	urlDomain := domain(websiteURL)
-	isSubstack := false
-	if strings.Contains(urlDomain, "substack.com") || doc.Find(`link[rel="preconnect"][href="https://substackcdn.com"]`).Length() > 0 {
-		isSubstack = true
-	}
-	if isSubstack {
-		return "SubStackScrapContent"
-	}
-	/*isGhost := false
-	content, exists := doc.Find(`meta[name="generator"]`).Attr("content")
-	if exists {
-		if strings.HasPrefix(content, "Ghost") && doc.Find("section.gh-content").Length() > 0 {
-			isGhost = true
-		}
-	}
-
-	if isGhost {
-		return "GhostScrapContent"
-	}*/
-	return ""
-}
-func ArticleContentExtractor(rawContent, entryUrl, feedUrl, rules string) (string, string) {
+// 得到content内容，主要在推荐算法爬取页面后解析正文内容
+func ArticleContentExtractor(rawContent, entryUrl string) (string, string) {
+	entryDomain := domain(entryUrl)
 	templateRawData := strings.NewReader(rawContent)
 	doc, _ := goquery.NewDocumentFromReader(templateRawData)
 
 	var content string
-	var ruleErr error
 	funcs := reflect.ValueOf(&templates.Template{})
-	rulesDomain := ""
-	contentRule := getRulesFromContent(entryUrl, doc)
-	if contentRule == "" {
-		rulesDomain, contentRule = getPredefinedContentTemplateRules(entryUrl)
-	}
+	contentRule := getPredefinedRules(entryUrl, doc)
 	if contentRule != "" {
 		f := funcs.MethodByName(contentRule)
-		res := f.Call([]reflect.Value{reflect.ValueOf(doc)})
+		res := f.Call([]reflect.Value{reflect.ValueOf(entryUrl), reflect.ValueOf(doc)})
 		content = res[0].String()
+	}
 
-	} else {
-		contentRule = rules
-		if contentRule == "" {
-			rulesDomain, contentRule = getPredefinedScraperRules(entryUrl)
-		}
-		if contentRule != "" {
-			content, ruleErr = templates.ScrapContentUseRules(doc, rules)
-			if ruleErr != nil {
-				log.Printf(`get document by rule error rules:%s,domain:%s,%q`, rules, rulesDomain, ruleErr)
-				return "", ""
-			}
-		}
-	}
 	if content != "" {
-		content = rewrite.Rewriter(entryUrl, content, "add_dynamic_image")
-		content = sanitizer.Sanitize(entryUrl, content)
-	}
-	if content == "" {
+		content = processContent(content, entryDomain, entryUrl)
+	} else {
 		content = templates.GetArticleByDivClass(doc)
 	}
 
@@ -85,56 +44,74 @@ func ArticleContentExtractor(rawContent, entryUrl, feedUrl, rules string) (strin
 		}
 		content = article.Content
 	}
-
-	postFuncs := reflect.ValueOf(&postExtractor.PostExtractorTemplate{})
 	contentPreRule := getContentPostExtractorTemplateRules(entryUrl)
 	if content != "" && contentPreRule != "" {
-		f := postFuncs.MethodByName(contentPreRule)
-		res := f.Call([]reflect.Value{reflect.ValueOf(content), reflect.ValueOf(feedUrl)})
-		postContent := res[0].String()
+		postContent := applyPostExtraction(contentPreRule, content)
 		if postContent != "" {
 			content = postContent
 		}
 	}
+
 	pureContent := getPureContent(content)
 	return content, pureContent
 }
 
-func NonMediaDownloadQueryInArticle(url string) (string, string, string) {
+// 根据url，不用正文内容获得下载信息
+// 对于ebook和pdf 通过url来解析，不需要爬取页面
+func DownloadTypeQueryByUrl(url string) (string, string, string) {
 	funcs := reflect.ValueOf(&templates.Template{})
-	_, mediaRule := getNonRawContentDownloadScraperRules(url)
+	_, mediaRule := getDownloadTypeByUrlRules(url)
 	if mediaRule != "" {
 		f := funcs.MethodByName(mediaRule)
 		res := f.Call([]reflect.Value{reflect.ValueOf(url)})
 		downloadUrl := res[0].String()
 		downloadFile := res[1].String()
 		downloadType := res[2].String()
-		if downloadType == "audio" || downloadType == "ebook" || downloadType == "pdf" {
-			return downloadUrl, downloadFile, downloadType
-		}
+		return downloadUrl, downloadFile, downloadType
 	}
 	return "", "", ""
 }
 
-func MediaDownloadQueryInArticle(rawContent, url string) (string, string) {
-	templateRawData := strings.NewReader(rawContent)
-	doc, _ := goquery.NewDocumentFromReader(templateRawData)
+// 根据模版表获得正文,作者，发布时间，以及下载信息
+func MetaDataQueryByTemplate(entryUrl, rawContent string, doc *goquery.Document) (string, string, int64, string, string, string) {
+	var content string
+	var author string
+	var mediaContent string
+	var downloadUrl string
+	var downloadType string
+	var publishedAt int64 = 0
 	funcs := reflect.ValueOf(&templates.Template{})
-	_, mediaRule := getPredefinedMediaScraperRules(url)
-	if mediaRule != "" {
-		f := funcs.MethodByName(mediaRule)
-		res := f.Call([]reflect.Value{reflect.ValueOf(url), reflect.ValueOf(doc)})
-		//mediaContent := res[0].String()
-		downloadUrl := res[1].String()
-		downloadType := res[2].String()
-		if downloadType == "audio" || downloadType == "ebook" || downloadType == "pdf" {
-			return downloadUrl, downloadType
+	contentRule := getPredefinedRules(entryUrl, doc)
+	if contentRule != "" {
+		f := funcs.MethodByName(contentRule)
+		res := f.Call([]reflect.Value{reflect.ValueOf(entryUrl), reflect.ValueOf(doc)})
+		content = res[0].String()
+		author = res[1].String()
+		publishedAt = res[2].Int()
+		mediaContent = res[3].String()
+		downloadUrl = res[4].String()
+		downloadType = res[5].String()
+	}
+	if author == "" {
+		if strings.Contains(entryUrl, "weixin.qq.com") {
+			author = templates.GetAuthorForWechat(doc)
+		} else {
+			author = templates.ScrapAuthorMetaData(doc)
 		}
 	}
-	return "", ""
+	if publishedAt == 0 {
+		if strings.Contains(entryUrl, "weixin.qq.com") {
+			publishedAt = templates.GetPublishedAtTimestampForWechat(rawContent, entryUrl)
+		} else {
+			publishedAt = templates.ScrapPublishedAtTimeMetaData(doc)
+		}
+	}
+	return content, author, publishedAt, mediaContent, downloadUrl, downloadType
 }
-func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, isrecommend bool) (string, string, *time.Time, string, string, string, int64, string, string, string) {
-	var publishedAtTimeStamp int64 = 0
+
+// 输入url，rawcontent
+// 输出entry的metadata
+func ArticleExtractor(rawContent, entryUrl string) (string, string, *time.Time, string, string, string, int64, string, string, string) {
 	templateRawData := strings.NewReader(rawContent)
 	doc, _ := goquery.NewDocumentFromReader(templateRawData)
 
@@ -144,193 +121,73 @@ func ArticleReadabilityExtractor(rawContent, entryUrl, feedUrl, rules string, is
 	log.Printf("get readability article %s", entryUrl)
 	if err != nil {
 		log.Printf(`article extractor error %q`, err)
-		return "", "", nil, "", "", "", publishedAtTimeStamp, "", "", ""
+		return "", "", nil, "", "", "", 0, "", "", ""
 	}
 
-	var content string
-	var author string
-	var ruleErr error
-	var mediaContent string
-	var mediaUrl string
-	var mediaType string
-
-	funcs := reflect.ValueOf(&templates.Template{})
-
-	_, metadataRule := getPredefinedMetaDataTemplateRules(entryUrl)
-	if metadataRule != "" {
-		f := funcs.MethodByName(metadataRule)
-		res := f.Call([]reflect.Value{reflect.ValueOf(doc)})
-		author = res[0].String()
-		/*published_at := res[1].String()
-			if published_at != "" {
-				ptime, parseErr := readability.ParseTime(published_at)
-				if parseErr != nil {
-					templateTime = &ptime
-		}
-			}*/
-	} else { //if !strings.Contains(entryUrl, "weixin.qq.com") { //else if !strings.HasPrefix(feedUrl, "wechat") {
-		author = templates.ScrapAuthorMetaData(doc)
-	}
-
-	_, mediaRule := getPredefinedMediaScraperRules(entryUrl)
-	if mediaRule != "" {
-		f := funcs.MethodByName(mediaRule)
-		res := f.Call([]reflect.Value{reflect.ValueOf(entryUrl), reflect.ValueOf(doc)})
-		mediaContent = res[0].String()
-		mediaUrl = res[1].String()
-		mediaType = res[2].String()
-	}
-
-	_, publishedAtRule := getPredefinedPublishedAtTimestampTemplateRules(entryUrl)
-	log.Printf("current publishedAtRule %s", publishedAtRule)
-	if publishedAtRule != "" {
-		f := funcs.MethodByName(publishedAtRule)
-		res := f.Call([]reflect.Value{reflect.ValueOf(doc)})
-		publishedAtTimeStamp = res[0].Int()
-
-	} else if !strings.Contains(entryUrl, "weixin.qq.com") { //else if !strings.HasPrefix(feedUrl, "wechat") {
-		publishedAtTimeStamp = templates.ScrapPublishedAtTimeMetaData(doc)
-	}
-	if strings.Contains(entryUrl, "weixin.qq.com") { //if strings.HasPrefix(feedUrl, "wechat") {
-		publishedAtTimeStamp = GetPublishedAtTimestampForWechat(rawContent, entryUrl)
-		if author == "" {
-			author = GetAuthorForWechat(doc)
-		}
-	}
-
-	rulesDomain := ""
-	contentRule := getRulesFromContent(entryUrl, doc)
-	if contentRule == "" {
-		rulesDomain, contentRule = getPredefinedContentTemplateRules(entryUrl)
-	}
-	if contentRule != "" {
-		f := funcs.MethodByName(contentRule)
-		res := f.Call([]reflect.Value{reflect.ValueOf(doc)})
-		content = res[0].String()
-
-	} else {
-		contentRule = rules
-		if contentRule == "" {
-			rulesDomain, contentRule = getPredefinedScraperRules(entryUrl)
-		}
-		if contentRule != "" {
-			content, ruleErr = templates.ScrapContentUseRules(doc, rules)
-			if ruleErr != nil {
-				log.Printf(`get document by rule error rules:%s,domain:%s,%q`, rules, rulesDomain, err)
-				return "", "", nil, "", "", "", publishedAtTimeStamp, "", "", ""
-			}
-		}
-	}
+	content, author, publishedAt, mediaContent, downloadUrl, downloadType := MetaDataQueryByTemplate(entryUrl, rawContent, doc)
 	if content != "" {
-		//readability.InsertToFile("before_add_dynamic_image.html", content)
-		if !strings.Contains(entryDomain, "douban.com") {
-			content = rewrite.Rewriter(entryUrl, content, "add_dynamic_image")
-		}
-		if strings.Contains(entryDomain, "okjike.com") || strings.Contains(entryDomain, "vimeo.com") ||
-			strings.Contains(entryDomain, "fandom.com") ||
-			strings.Contains(entryDomain, "notion.site") || strings.Contains(entryDomain, "quora.com") {
-			//不进行santitize
-			if strings.Contains(entryDomain, "notion.site") {
-				article.Title = doc.Find("title").Text()
-			}
-		} else {
-			content = sanitizer.Sanitize(entryUrl, content)
-		}
-	}
-
-	if content == "" {
+		content = processContent(content, entryDomain, entryUrl)
+	} else {
 		content = templates.GetArticleByDivClass(doc)
 	}
-
-	if content != "" || mediaType != "" {
+	if content != "" {
 		article.Content = content
 	}
 
-	postFuncs := reflect.ValueOf(&postExtractor.PostExtractorTemplate{})
 	contentPreRule := getContentPostExtractorTemplateRules(entryUrl)
-	if contentPreRule != "" {
-		f := postFuncs.MethodByName(contentPreRule)
-		res := f.Call([]reflect.Value{reflect.ValueOf(article.Content), reflect.ValueOf(feedUrl)})
-		content := res[0].String()
-		if content != "" {
-			article.Content = content
+	if article.Content != "" && contentPreRule != "" {
+		postContent := applyPostExtraction(contentPreRule, article.Content)
+		if postContent != "" {
+			article.Content = postContent
 		}
 	}
-	pureContent := getPureContent(article.Content)
-	/*checkArticleImage := getArticleImage(rawContent, entryUrl)
-	if checkArticleImage != "" {
-		article.Image = checkArticleImage
-	}*/
 
+	pureContent := getPureContent(article.Content)
+	updateTitle := updateArticleTitle(entryDomain, doc)
+	if updateTitle != "" {
+		article.Title = updateTitle
+	}
+	return article.Content, pureContent, article.PublishedDate, article.Image, article.Title, author, publishedAt, mediaContent, downloadUrl, downloadType
+}
+
+func updateArticleTitle(entryDomain string, doc *goquery.Document) string {
+	updateTitle := ""
 	if strings.Contains(entryDomain, "reddit.com") {
 		doc.Find("shreddit-post").Each(func(i int, s *goquery.Selection) {
 			if title, exists := s.Attr("post-title"); exists {
-				article.Title = strings.TrimSpace(title)
+				updateTitle = strings.TrimSpace(title)
 			}
 		})
 	}
-	return article.Content, pureContent, article.PublishedDate, article.Image, article.Title, author, publishedAtTimeStamp, mediaContent, mediaUrl, mediaType
+	return updateTitle
+}
+func applyPostExtraction(contentPreRule, articleContent string) string {
+	postFuncs := reflect.ValueOf(&postExtractor.PostExtractorTemplate{})
+	f := postFuncs.MethodByName(contentPreRule)
+	res := f.Call([]reflect.Value{reflect.ValueOf(articleContent)})
+	return res[0].String()
 }
 
-/*
-	func getArticleImage(content, url string) string {
-		articleImage := ""
-		if strings.Contains(url, "bilibili.com/bangumi/play") {
-			ep := ""
-			re := regexp.MustCompile(`play/ep(\d+)`)
-			match := re.FindStringSubmatch(url)
-			if len(match) > 1 {
-				ep = match[1]
-			}
-			log.Printf("get bili bangumi image:%s", ep)
-			if ep != "" {
-				doc, _ := goquery.NewDocumentFromReader(strings.NewReader(content))
-				var session interface{}
-				doc.Find("script[type='application/json']").Each(func(i int, s *goquery.Selection) {
-					scriptContent := strings.TrimSpace(s.Text())
-					var metaData map[string]interface{}
-					unmarshalErr := json.Unmarshal([]byte(scriptContent), &metaData)
-					if unmarshalErr != nil {
-						log.Printf("convert  unmarshalError %v", unmarshalErr)
-						return
-					}
-					if props, ok := metaData["props"]; ok {
-						if pageProps, ok := props.(map[string]interface{})["pageProps"]; ok {
-							if dehydratedState, ok := pageProps.(map[string]interface{})["dehydratedState"]; ok {
-								if queries, ok := dehydratedState.(map[string]interface{})["queries"]; ok {
-									queriesArr := queries.([]interface{})
-									if len(queriesArr) > 1 {
-										if state, ok := queriesArr[1].(map[string]interface{})["state"]; ok {
-											if stateData, ok := state.(map[string]interface{})["data"]; ok {
-												session = stateData.(map[string]interface{})["seasons"]
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				})
-				if session != nil {
-					for _, seasonDetail := range session.([]interface{}) {
-						sessionMap := seasonDetail.(map[string]interface{})
-						if new_ep, ok := sessionMap["new_ep"]; ok {
-							new_ep_data := new_ep.(map[string]interface{})
-							id, idok := new_ep_data["id"]
-							cover, coverok := new_ep_data["cover"]
-							idstr := fmt.Sprintf("%.0f", id.(float64))
-							if idok && coverok && idstr == ep {
-								articleImage = cover.(string)
-								return articleImage
-							}
-						}
-					}
-				}
-			}
+func isSanitizeRequired(entryDomain string) bool {
+	nonSanitizeDomains := []string{"okjike.com", "vimeo.com", "fandom.com", "notion.site", "quora.com"}
+	for _, domain := range nonSanitizeDomains {
+		if strings.Contains(entryDomain, domain) {
+			return false
 		}
-		return articleImage
 	}
-*/
+	return true
+}
+
+func processContent(content, entryDomain, entryUrl string) string {
+	if !strings.Contains(entryDomain, "douban.com") {
+		content = rewrite.Rewriter(entryUrl, content, "add_dynamic_image")
+	}
+	if isSanitizeRequired(entryDomain) {
+		return sanitizer.Sanitize(entryUrl, content)
+	}
+	return content
+}
+
 func getPureContent(content string) string {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(content))
 	if err == nil {
@@ -340,44 +197,4 @@ func getPureContent(content string) string {
 		return pureText
 	}
 	return ""
-}
-
-func GetPublishedAtTimestampForWechat(rawContent string, url string) int64 {
-	var publishedAtTimestamp int64 = 0
-	re := regexp.MustCompile(`var oriCreateTime = '(\d+)';`)
-	match := re.FindStringSubmatch(rawContent)
-	if len(match) > 1 {
-		timestamp, err := strconv.ParseInt(match[1], 10, 64)
-		if err != nil {
-			log.Printf("can not parse timestamp [%s] for entry [%s]", match[1], url)
-			return publishedAtTimestamp
-		}
-		publishedAtTimestamp = timestamp
-	} else {
-		log.Printf("can not find timestamp for entry [%s]", url)
-		return publishedAtTimestamp
-	}
-	return publishedAtTimestamp
-
-}
-
-func GetAuthorForWechat(document *goquery.Document) string {
-	author := ""
-	document.Find("div#meta_content>span.rich_media_meta_text").Each(func(i int, s *goquery.Selection) {
-		content := s.Text()
-		content = strings.TrimSpace(content)
-		content = strings.ReplaceAll(content, "\n", "")
-		author = content
-	})
-	if author == "" {
-		document.Find("div#meta_content>span.rich_media_meta_nickname").Each(func(i int, s *goquery.Selection) {
-			content := s.Text()
-			content = strings.TrimSpace(content)
-			content = strings.ReplaceAll(content, "\n", "")
-			author = content
-		})
-	}
-
-	return author
-
 }

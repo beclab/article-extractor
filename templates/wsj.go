@@ -4,9 +4,8 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (t *Template) WsjScrapContent(document *goquery.Document) string {
+func (t *Template) WsjExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
 	contents := ""
-
 	document.Find("div[data-testid=ad-container]").Each(func(i int, s *goquery.Selection) {
 		RemoveNodes(s)
 	})
@@ -15,5 +14,6 @@ func (t *Template) WsjScrapContent(document *goquery.Document) string {
 		content, _ = goquery.OuterHtml(s)
 		contents += content
 	})
-	return contents
+
+	return contents, "", 0, "", "", ""
 }
