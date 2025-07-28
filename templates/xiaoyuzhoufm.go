@@ -42,7 +42,7 @@ func xiaoyuzhouScrapAuthor(document *goquery.Document) string {
 	return author
 }
 
-func (t *Template) XiaoyuzhouExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
+func (t *Template) XiaoyuzhouFMExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
 	content := xiaoyuzhouScrapContent(document)
 	author := xiaoyuzhouScrapAuthor(document)
 	audioUrl := ""
