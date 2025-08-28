@@ -46,10 +46,12 @@ func (t *Template) XiaoyuzhouFMExtractorMetaInfo(url string, document *goquery.D
 	content := xiaoyuzhouScrapContent(document)
 	author := xiaoyuzhouScrapAuthor(document)
 	audioUrl := ""
+	fileType := ""
 	document.Find("meta[property='og:audio']").Each(func(i int, s *goquery.Selection) {
 		if content, exists := s.Attr("content"); exists {
 			audioUrl = content
+			fileType = AudioFileType
 		}
 	})
-	return content, author, 0, audioUrl, audioUrl, "audio"
+	return content, author, 0, audioUrl, audioUrl, fileType
 }

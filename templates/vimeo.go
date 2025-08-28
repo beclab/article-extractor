@@ -44,7 +44,7 @@ func (t *Template) VimeoExtractorMetaInfo(url string, document *goquery.Document
 			videoID := match[1]
 			embedUrl := "https://player.vimeo.com/video/" + videoID
 			contents := "<iframe width='896' height='504' src='" + embedUrl + "' frameborder='0' referrerpolicy='no-referrer'></iframe>"
-			return content, "", 0, contents, url, "video"
+			return content, "", 0, contents, url, VideoFileType
 		}
 
 	}

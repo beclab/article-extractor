@@ -144,7 +144,7 @@ var contentTemplatePredefinedRules = map[string]string{
 	"zhihu.com":              "ZhihuExtractorMetaInfo",
 }
 
-var DownloadTypeUrlTemplatedRules = map[string]string{
+var downloadTypeUrlTemplatedRules = map[string]string{
 	"manybooks.net":      "ManyBooksDownloadType", //need cookies
 	"standardebooks.org": "StandardebooksDownloadType",
 	"z-library.gs":       "ZLibraryDownloadType", //need cookies
@@ -179,7 +179,7 @@ func getContentPostExtractorTemplateRules(websiteURL string) string {
 
 func getDownloadTypeByUrlRules(websiteURL string) (string, string) {
 	urlDomain := domain(websiteURL)
-	for domain, rules := range DownloadTypeUrlTemplatedRules {
+	for domain, rules := range downloadTypeUrlTemplatedRules {
 		if strings.Contains(urlDomain, domain) {
 			return domain, rules
 		}

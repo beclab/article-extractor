@@ -33,7 +33,7 @@ func (t *Template) StandardebooksDownloadType(url string, document *goquery.Docu
 	if isEpubURL(url) {
 		fileName := extractStandardebooksName(url)
 		url = url + "?source=download"
-		return url, fileName, "ebook"
+		return url, fileName, EbookFileType
 	}
 	return "", "", ""
 

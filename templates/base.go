@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/beclab/article-extractor/readability"
@@ -17,6 +18,32 @@ type ExtractorFileInfo struct {
 	DownloadURL string
 	FileName    string
 	FileType    string
+}
+
+const (
+	ShanghaiTZ = "Asia/Shanghai"
+	UrumqiTZ   = "Asia/Urumqi"
+)
+
+const (
+	VideoFileType = "video"
+	AudioFileType = "audio"
+	PdfFileType   = "pdf"
+	EbookFileType = "ebook"
+)
+
+func ParseLocationTimestamp(timeStr, layout string, location string) (int64, error) {
+	loc, err := time.LoadLocation(location)
+	if err != nil {
+		return 0, err
+	}
+
+	t, err := time.ParseInLocation(layout, timeStr, loc)
+	if err != nil {
+		return 0, err
+	}
+
+	return t.Unix(), nil
 }
 
 func GetArticleByDivClass(document *goquery.Document) string {

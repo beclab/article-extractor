@@ -23,6 +23,7 @@ func spreakerScrapContent(document *goquery.Document) string {
 func (t *Template) SpreakerExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
 	content := spreakerScrapContent(document)
 	audioUrl := ""
+	fileType := ""
 	document.Find("meta[name='twitter:player']").Each(func(i int, s *goquery.Selection) {
 		content, _ := s.Attr("content")
 		//"https://widget.spreaker.com/player?episode_id=60819052&playlist=show&cover_image_url=https%3A%2F%2Fd3wo5wojvuv7l.cloudfront.net%2Fimages.spreaker.com%2Foriginal%2F551ce348940065825b0a755b58fdb5ae.jpg"
@@ -31,7 +32,8 @@ func (t *Template) SpreakerExtractorMetaInfo(url string, document *goquery.Docum
 		if startIndex > -1 && endIndex > -1 {
 			episodeID := content[startIndex : startIndex+endIndex]
 			audioUrl = "https://api.spreaker.com/v2/episodes/" + episodeID + "/ondemand.mp3"
+			fileType = AudioFileType
 		}
 	})
-	return content, "", 0, audioUrl, audioUrl, "audio"
+	return content, "", 0, audioUrl, audioUrl, fileType
 }

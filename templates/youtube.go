@@ -15,7 +15,7 @@ func (t *Template) YoutubeExtractorMetaInfo(url string, document *goquery.Docume
 			videoID := match[1]
 			embedUrl := "https://www.youtube.com/embed/gfx7mTmWdYU?si=" + videoID
 			contents := "<iframe width='840' height='472' src='" + embedUrl + "'  frameborder='0' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share' referrerpolicy='strict-origin-when-cross-origin' allowfullscreen></iframe>"
-			return "", "", 0, contents, url, "video"
+			return "", "", 0, contents, url, VideoFileType
 		}
 
 	}

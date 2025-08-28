@@ -18,8 +18,10 @@ func ximalayaScrapContent(document *goquery.Document) string {
 func (t *Template) XimalayaExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
 	content := ximalayaScrapContent(document)
 	author := ""
+	fileType := ""
 	document.Find("a.albumTitle").Each(func(i int, s *goquery.Selection) {
 		author = s.Text()
+		fileType = AudioFileType
 	})
-	return content, author, 0, url, url, "audio"
+	return content, author, 0, url, url, fileType
 }
