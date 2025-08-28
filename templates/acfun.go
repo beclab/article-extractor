@@ -36,5 +36,5 @@ func (t *Template) ACFunExtractorMetaInfo(url string, document *goquery.Document
 		author = s.Text()
 	})
 	publishedAt := acFunScrapPublishedAt(document)
-	return content, author, publishedAt, "", url, "video"
+	return content, author, publishedAt, "", url, VideoFileType
 }

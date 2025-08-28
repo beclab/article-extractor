@@ -23,6 +23,7 @@ func podBeanScrapContent(document *goquery.Document) string {
 
 func (t *Template) PodBeanExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
 	audioUrl := ""
+	fileType := ""
 	content := podBeanScrapContent(document)
 	scriptSelector := "script[type=\"application/ld+json\"]"
 	document.Find(scriptSelector).Each(func(i int, s *goquery.Selection) {
@@ -38,9 +39,10 @@ func (t *Template) PodBeanExtractorMetaInfo(url string, document *goquery.Docume
 				associatedMediaDetail := associatedMediaData.(map[string]interface{})
 				if contentUrl, ok := associatedMediaDetail["contentUrl"]; ok {
 					audioUrl = contentUrl.(string)
+					fileType = AudioFileType
 				}
 			}
 		}
 	})
-	return content, "", 0, audioUrl, audioUrl, "audio"
+	return content, "", 0, audioUrl, audioUrl, fileType
 }

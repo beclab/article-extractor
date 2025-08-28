@@ -32,13 +32,13 @@ func (t *Template) ManyBooksDownloadType(urlStr string) (string, string, string)
 		//ebook
 		id := extractIDWithRegex(urlStr)
 		downloadUrl := "https://library.manybooks.net/live/get-book/" + id + "/epub"
-		return downloadUrl, id + ".epub", "ebook"
+		return downloadUrl, id + ".epub", EbookFileType
 	}
 	if lastPart == "6" {
 		//pdf
 		id := extractIDWithRegex(urlStr)
 		downloadUrl := "https://library.manybooks.net/live/get-book/" + id + "/pdf"
-		return downloadUrl, id + ".pdf", "pdf"
+		return downloadUrl, id + ".pdf", PdfFileType
 	}
 
 	return "", "", ""

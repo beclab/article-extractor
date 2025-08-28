@@ -49,7 +49,7 @@ func (t *Template) ZLibraryDownloadType(url string) (string, string, string) {
 		return "", "", ""
 	}
 	if matched {
-		return url, extractZLibraryIDWithRegex(url) + ".epub", "ebook"
+		return url, extractZLibraryIDWithRegex(url) + ".epub", EbookFileType
 	}
 	return "", "", ""
 

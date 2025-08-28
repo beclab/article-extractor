@@ -14,7 +14,7 @@ import (
 	"github.com/beclab/article-extractor/templates/postExtractor"
 )
 
-// 得到content内容，主要在推荐算法爬取页面后解析正文内容
+// Obtain the content, primarily by parsing the main body after crawling the page with the recommendation algorithm
 func ArticleContentExtractor(rawContent, entryUrl string) (string, string) {
 	entryDomain := domain(entryUrl)
 	templateRawData := strings.NewReader(rawContent)
@@ -56,8 +56,8 @@ func ArticleContentExtractor(rawContent, entryUrl string) (string, string) {
 	return content, pureContent
 }
 
-// 根据url，不用正文内容获得下载信息
-// 对于ebook和pdf 通过url来解析，不需要爬取页面
+// Obtain download information based on the URL, without using the main content.
+// Parse eBook and PDF information directly from the URL, without crawling the page.
 func DownloadTypeQueryByUrl(url string) (string, string, string) {
 	funcs := reflect.ValueOf(&templates.Template{})
 	_, mediaRule := getDownloadTypeByUrlRules(url)
@@ -72,7 +72,7 @@ func DownloadTypeQueryByUrl(url string) (string, string, string) {
 	return "", "", ""
 }
 
-// 根据模版表获得正文,作者，发布时间，以及下载信息
+// Obtain the main content, author, publication date, and download information based on the template table.
 func MetaDataQueryByTemplate(entryUrl, rawContent string, doc *goquery.Document) (string, string, int64, string, string, string) {
 	var content string
 	var author string
@@ -109,8 +109,7 @@ func MetaDataQueryByTemplate(entryUrl, rawContent string, doc *goquery.Document)
 	return content, author, publishedAt, mediaContent, downloadUrl, downloadType
 }
 
-// 输入url，rawcontent
-// 输出entry的metadata
+// Input the URL and raw content, and output the metadata of the entry.
 func ArticleExtractor(rawContent, entryUrl string) (string, string, *time.Time, string, string, string, int64, string, string, string) {
 	templateRawData := strings.NewReader(rawContent)
 	doc, _ := goquery.NewDocumentFromReader(templateRawData)

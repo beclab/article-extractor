@@ -30,7 +30,7 @@ func (t *Template) RumbleExtractorMetaInfo(entryUrl string, document *goquery.Do
 
 	if embeddingUrl != "" {
 		contents := "<iframe width='960' height='540' src='" + embeddingUrl + "'  frameborder='0'  referrerpolicy='no-referrer'></iframe>"
-		return "", "", 0, contents, entryUrl, "video"
+		return "", "", 0, contents, entryUrl, VideoFileType
 	}
 	return "", "", 0, "", "", ""
 }
