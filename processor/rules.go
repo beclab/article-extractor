@@ -141,6 +141,7 @@ var contentTemplatePredefinedRules = map[string]string{
 	"yahoo.com":              "YahooExtractorMetaInfo",
 	"ycombinator.com":        "YcombinatorExtractorMetaInfo",
 	"youtube.com":            "YoutubeExtractorMetaInfo",
+	"youtu.be":               "YoutubeShortExtractorMetaInfo",
 	"zhihu.com":              "ZhihuExtractorMetaInfo",
 }
 
