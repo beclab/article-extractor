@@ -13,6 +13,7 @@ func bilibiliScrapContent(document *goquery.Document) string {
 	document.Find("span.desc-info-text,div.opus-module-content").Each(func(i int, s *goquery.Selection) {
 		var content string
 		content, _ = goquery.OuterHtml(s)
+		content = strings.Replace(content, "\n", "<br>", -1)
 		contents += content
 	})
 	if contents != "" {
@@ -21,6 +22,7 @@ func bilibiliScrapContent(document *goquery.Document) string {
 	document.Find("p[class*='mediainfo_content_placeholder']").Each(func(i int, s *goquery.Selection) {
 		var content string
 		content, _ = goquery.OuterHtml(s)
+		content = strings.Replace(content, "\n", "<br>", -1)
 		contents += content
 	})
 	add_img := ""
@@ -65,7 +67,7 @@ func (t *Template) BilibiliExtractorMetaInfo(url string, document *goquery.Docum
 		contents := "<iframe width='910' height='668' src='" + embeddingUrl + "'  border='0' scrolling='no' border='0 frameborder='no' framespacing='0' allowfullscreen='true' referrerpolicy='no-referrer'></iframe>"
 		return content, author, publishedAt, contents, url, VideoFileType
 	}
-	if strings.Contains(url, "bilibili.com/festival/") {
+	if strings.Contains(url, "bilibili.com/video/") || strings.Contains(url, "bilibili.com/festival/") {
 		return content, author, publishedAt, "", url, VideoFileType
 	}
 	if strings.Contains(url, "audio/au") {

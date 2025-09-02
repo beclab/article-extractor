@@ -21,3 +21,7 @@ func (t *Template) YoutubeExtractorMetaInfo(url string, document *goquery.Docume
 	}
 	return "", "", 0, "", "", ""
 }
+
+func (t *Template) YoutubeShortExtractorMetaInfo(url string, document *goquery.Document) (string, string, int64, string, string, string) {
+	return "", "", 0, "", url, VideoFileType
+}
